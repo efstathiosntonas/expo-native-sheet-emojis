@@ -16,7 +16,8 @@
     "typecheck": "tsc --noEmit",
     "prepare": "lefthook install && bob build && tsc --project plugin/tsconfig.json",
     "prepublishOnly": "bob build && tsc --project plugin/tsconfig.json",
-    "build:plugin": "tsc --project plugin/tsconfig.json"
+    "build:plugin": "tsc --project plugin/tsconfig.json",
+    "release": "release-it"
   },
   "keywords": [
     "expo",
@@ -46,6 +47,7 @@
     "react-native": ">=0.81.0"
   },
   "devDependencies": {
+    "@release-it/conventional-changelog": "^10.0.6",
     "@types/react": "~19.2.14",
     "del-cli": "6.0.0",
     "eslint": "9.0.0",
@@ -57,6 +59,7 @@
     "react": "19.2.4",
     "react-native": "0.83.3",
     "react-native-builder-bob": "0.40.0",
+    "release-it": "^19.2.4",
     "typescript": "~5.9.3"
   },
   "files": [
