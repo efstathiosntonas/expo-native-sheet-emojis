@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.3](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.0.2...v1.0.3) (2026-03-18)
+
+### Chores
+
+* adjust debounce timer to 500ms on both iOS and Android ([072211d](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/072211d35acc78705c88d92ff41ff76c910a83df))
+
 ## [1.0.2](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.0.1...v1.0.2) (2026-03-18)
 
 ### Chores
