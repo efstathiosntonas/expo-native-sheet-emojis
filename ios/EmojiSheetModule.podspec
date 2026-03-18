@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
   s.summary        = 'Native emoji picker bottom sheet for React Native'
   s.description    = 'A fully native iOS/Android emoji picker presented in a bottom sheet with search, skin tones, and theming support.'
   s.author         = ''
-  s.homepage       = 'https://github.com/user/expo-native-sheet-emojis'
+  s.homepage       = 'https://github.com/efstathiosntonas/expo-native-sheet-emojis'
   s.license        = { type: 'MIT' }
   s.platforms      = { ios: '15.1' }
   s.source         = { git: '' }
