@@ -1,5 +1,7 @@
 # expo-native-sheet-emojis
 
+[![npm version](https://img.shields.io/npm/v/expo-native-sheet-emojis.svg)](https://www.npmjs.com/package/expo-native-sheet-emojis)
+
 A fully native emoji picker bottom sheet for React Native. Built entirely in Swift (iOS) and Kotlin (Android) -- every interaction runs at 60+ FPS with zero bridge overhead.
 
 ## Highlights
