@@ -12,6 +12,9 @@
     "publish": true,
     "publishArgs": ["--access public"]
   },
+  "hooks": {
+    "after:bump": "sed -i '' \"s/s.version.*=.*/s.version        = '${version}'/\" ios/EmojiSheetModule.podspec && git add ios/EmojiSheetModule.podspec"
+  },
   "plugins": {
     "@release-it/conventional-changelog": {
       "preset": {
