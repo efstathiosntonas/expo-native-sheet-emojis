@@ -13,3 +13,8 @@ example/ios/
 example/android/
 *.log
 .DS_Store
+
+# Translation dirs must stay empty in the repo.
+# Locale files are copied at build time by Podfile/Gradle/config plugin.
+ios/translations/*.json
+android/src/main/assets/translations/*.json
