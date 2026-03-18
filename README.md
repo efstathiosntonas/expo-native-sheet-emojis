@@ -32,7 +32,7 @@ npx expo install expo-native-sheet-emojis
 
 For bare workflow projects, run `npx expo prebuild` after installation.
 
-For bare React Native projects using `expo-modules-core`:
+For bare React Native projects, you must ensure that you have [installed and configured the `expo` package](https://docs.expo.dev/bare/installing-expo-modules/) before continuing.
 
 ```bash
 yarn add expo-native-sheet-emojis
