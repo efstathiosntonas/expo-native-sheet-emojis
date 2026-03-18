@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["EmojiSheetModule"]
+  },
+  "android": {
+    "modules": ["expo.community.modules.emojisheet.EmojiSheetModule"]
+  }
+}

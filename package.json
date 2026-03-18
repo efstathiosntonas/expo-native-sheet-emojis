@@ -1,0 +1,98 @@
+{
+  "name": "expo-native-sheet-emojis",
+  "version": "1.0.0",
+  "description": "A fully native emoji picker bottom sheet for React Native. Built with Swift and Kotlin for maximum performance. Features search with multilingual keywords, skin tones, frequently used tracking, theming, and configurable layout.",
+  "main": "lib/commonjs/index.js",
+  "module": "lib/module/index.js",
+  "types": "lib/typescript/index.d.ts",
+  "react-native": "src/index.ts",
+  "source": "src/index.ts",
+  "scripts": {
+    "build": "bob build",
+    "clean": "del-cli lib",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "typecheck": "tsc --noEmit",
+    "prepare": "lefthook install && bob build && tsc --project plugin/tsconfig.json",
+    "prepublishOnly": "bob build && tsc --project plugin/tsconfig.json",
+    "build:plugin": "tsc --project plugin/tsconfig.json"
+  },
+  "keywords": [
+    "expo",
+    "react-native",
+    "emoji",
+    "picker",
+    "bottom-sheet",
+    "native",
+    "ios",
+    "android",
+    "keyboard",
+    "input"
+  ],
+  "license": "MIT",
+  "author": "Efstathios Ntonas <efstathiosntonas@gmail.com> (https://github.com/efstathiosntonas)",
+  "homepage": "https://github.com/efstathiosntonas/expo-native-sheet-emojis#readme",
+  "bugs": {
+    "url": "https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/efstathiosntonas/expo-native-sheet-emojis.git"
+  },
+  "peerDependencies": {
+    "expo": ">=54.0.0",
+    "react": ">=18.3.1",
+    "react-native": ">=0.81.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.14",
+    "del-cli": "6.0.0",
+    "eslint": "9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "expo": "~55.0.0",
+    "expo-modules-core": "~55.0.16",
+    "lefthook": "2.1.4",
+    "prettier": "3.8.0",
+    "react": "19.2.4",
+    "react-native": "0.83.3",
+    "react-native-builder-bob": "0.40.0",
+    "typescript": "~5.9.3"
+  },
+  "files": [
+    "lib/",
+    "src/",
+    "ios/",
+    "android/",
+    "translations/",
+    "app.plugin.js",
+    "plugin/build/",
+    "expo-module.config.json"
+  ],
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "commonjs",
+        {
+          "copyFlow": false
+        }
+      ],
+      [
+        "module",
+        {
+          "copyFlow": false
+        }
+      ],
+      "typescript"
+    ]
+  },
+  "eslintIgnore": [
+    "node_modules/",
+    "lib/",
+    "plugin/build/",
+    "example/"
+  ],
+  "packageManager": "yarn@4.13.0"
+}

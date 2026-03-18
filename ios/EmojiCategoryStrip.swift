@@ -1,0 +1,175 @@
+import UIKit
+
+protocol EmojiCategoryStripDelegate: AnyObject {
+    func categoryStrip(_ strip: EmojiCategoryStrip, didSelectCategoryAt index: Int)
+}
+
+class EmojiCategoryStrip: UIView, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    weak var delegate: EmojiCategoryStripDelegate?
+
+    private var currentTheme: EmojiSheetTheme = .light
+    private var selectedIndex: Int = 0
+    private var isSearchActive = false
+
+    private static let sfSymbolForCategory: [String: String] = [
+        "frequently_used": "clock.fill",
+        "smileys_emotion": "face.smiling",
+        "people_body": "hand.raised.fill",
+        "animals_nature": "pawprint.fill",
+        "food_drink": "fork.knife",
+        "travel_places": "airplane",
+        "activities": "sportscourt.fill",
+        "objects": "lightbulb.fill",
+        "symbols": "exclamationmark.circle",
+        "flags": "flag.fill",
+    ]
+
+    private var categoryKeys: [String] = []
+
+    private var collectionView: UICollectionView!
+    private let dividerLine = UIView()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupViews()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func setupViews() {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumInteritemSpacing = 0
+        layout.minimumLineSpacing = 0
+
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = .clear
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.register(CategoryCell.self, forCellWithReuseIdentifier: "CategoryCell")
+        addSubview(collectionView)
+
+        dividerLine.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(dividerLine)
+
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: topAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: dividerLine.topAnchor),
+
+            dividerLine.leadingAnchor.constraint(equalTo: leadingAnchor),
+            dividerLine.trailingAnchor.constraint(equalTo: trailingAnchor),
+            dividerLine.bottomAnchor.constraint(equalTo: bottomAnchor),
+            dividerLine.heightAnchor.constraint(equalToConstant: 1.0 / UIScreen.main.scale),
+        ])
+    }
+
+    func updateCategories(_ keys: [String]) {
+        categoryKeys = keys
+        selectedIndex = 0
+        collectionView.reloadData()
+    }
+
+    func applyTheme(_ theme: EmojiSheetTheme) {
+        currentTheme = theme
+        backgroundColor = theme.categoryBarBackgroundColor
+        dividerLine.backgroundColor = theme.dividerColor
+        collectionView.reloadData()
+    }
+
+    func selectCategory(at index: Int) {
+        guard !isSearchActive, index != selectedIndex, index >= 0, index < categoryKeys.count else { return }
+        selectedIndex = index
+        collectionView.reloadData()
+        collectionView.scrollToItem(
+            at: IndexPath(item: index, section: 0),
+            at: .centeredHorizontally,
+            animated: true
+        )
+    }
+
+    func setSearchActive(_ active: Bool) {
+        isSearchActive = active
+        collectionView.reloadData()
+    }
+
+    // MARK: - UICollectionViewDataSource
+
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return categoryKeys.count
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CategoryCell", for: indexPath) as! CategoryCell
+        let key = categoryKeys[indexPath.item]
+        let sfSymbol = Self.sfSymbolForCategory[key] ?? "questionmark.circle"
+        let isSelected = !isSearchActive && indexPath.item == selectedIndex
+        cell.configure(
+            sfSymbol: sfSymbol,
+            isSelected: isSelected,
+            theme: currentTheme
+        )
+        return cell
+    }
+
+    // MARK: - UICollectionViewDelegateFlowLayout
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = collectionView.bounds.width / CGFloat(categoryKeys.count)
+        return CGSize(width: max(width, 36), height: collectionView.bounds.height)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        selectedIndex = indexPath.item
+        isSearchActive = false
+        collectionView.reloadData()
+        delegate?.categoryStrip(self, didSelectCategoryAt: indexPath.item)
+    }
+}
+
+// MARK: - Category Cell
+
+private class CategoryCell: UICollectionViewCell {
+    private let circleView = UIView()
+    private let iconView = UIImageView()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+
+        circleView.translatesAutoresizingMaskIntoConstraints = false
+        circleView.layer.cornerRadius = 16
+        contentView.addSubview(circleView)
+
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+        iconView.contentMode = .scaleAspectFit
+        contentView.addSubview(iconView)
+
+        NSLayoutConstraint.activate([
+            circleView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            circleView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            circleView.widthAnchor.constraint(equalToConstant: 32),
+            circleView.heightAnchor.constraint(equalToConstant: 32),
+
+            iconView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            iconView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            iconView.widthAnchor.constraint(equalToConstant: 22),
+            iconView.heightAnchor.constraint(equalToConstant: 22),
+        ])
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func configure(sfSymbol: String, isSelected: Bool, theme: EmojiSheetTheme) {
+        let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .medium)
+        iconView.image = UIImage(systemName: sfSymbol, withConfiguration: config)
+        iconView.tintColor = isSelected ? theme.categoryActiveIconColor : theme.categoryIconColor
+        circleView.backgroundColor = isSelected ? theme.categoryActiveBackgroundColor : .clear
+    }
+}

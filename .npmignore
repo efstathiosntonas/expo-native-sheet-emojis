@@ -1,0 +1,6 @@
+scripts/
+example/
+.github/
+*.tsbuildinfo
+.DS_Store
+.expo/

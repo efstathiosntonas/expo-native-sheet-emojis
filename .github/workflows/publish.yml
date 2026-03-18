@@ -1,0 +1,47 @@
+name: Publish to npm
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build JS/TS
+        run: npm run build
+
+      - name: Build config plugin
+        run: npm run build:plugin
+
+      - name: Verify build output
+        run: |
+          echo "--- Checking lib/ ---"
+          test -f lib/commonjs/index.js || (echo "FAIL: lib/commonjs/index.js missing" && exit 1)
+          test -f lib/module/index.js || (echo "FAIL: lib/module/index.js missing" && exit 1)
+          test -f lib/typescript/index.d.ts || (echo "FAIL: lib/typescript/index.d.ts missing" && exit 1)
+          echo "--- Checking plugin/build/ ---"
+          test -f plugin/build/withEmojiSheet.js || (echo "FAIL: plugin/build/withEmojiSheet.js missing" && exit 1)
+          echo "--- All build outputs verified ---"
+
+      - name: Dry run pack
+        run: npm pack --dry-run
+
+      - name: Publish with provenance
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

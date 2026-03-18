@@ -1,0 +1,15 @@
+/.idea/
+node_modules/
+lib/
+build/
+plugin/build/
+*.tsbuildinfo
+.expo/
+ios/Pods/
+android/build/
+example/node_modules/
+example/.expo/
+example/ios/
+example/android/
+*.log
+.DS_Store
