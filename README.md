@@ -100,6 +100,67 @@ await EmojiSheetModule.present({
 });
 ```
 
+## Custom Hook Pattern
+
+For apps that use the emoji picker in multiple places, extract a reusable hook to centralize theme, translations, and configuration:
+
+```typescript
+import { EmojiSheetModule } from 'expo-native-sheet-emojis';
+import type { EmojiSheetPresentOptions, EmojiSheetResult } from 'expo-native-sheet-emojis';
+
+export function useEmojiPicker() {
+  // Pull your theme colors and i18n strings from your app's providers
+  const theme = useAppTheme();
+  const { t } = useTranslation();
+
+  const present = async (
+    overrides?: Partial<EmojiSheetPresentOptions>
+  ): Promise<EmojiSheetResult> => {
+    return EmojiSheetModule.present({
+      theme: {
+        accentColor: theme.colors.primary,
+        backgroundColor: theme.colors.background,
+        searchBarBackgroundColor: theme.colors.surface,
+        textColor: theme.colors.text,
+        textSecondaryColor: theme.colors.textSecondary,
+        dividerColor: theme.colors.border,
+      },
+      translations: {
+        searchPlaceholder: t('Search emoji'),
+        noResultsText: t('No emojis found'),
+        categoryNames: {
+          frequently_used: t('Frequently Used'),
+          smileys_emotion: t('Smileys & Emotion'),
+          people_body: t('People & Body'),
+          animals_nature: t('Animals & Nature'),
+          food_drink: t('Food & Drink'),
+          travel_places: t('Travel & Places'),
+          activities: t('Activities'),
+          objects: t('Objects'),
+          symbols: t('Symbols'),
+          flags: t('Flags'),
+        },
+      },
+      excludeEmojis: ['pile_of_poo'],
+      ...overrides,
+    });
+  };
+
+  return { present };
+}
+```
+
+Then use it anywhere with a single line:
+
+```typescript
+const emojiPicker = useEmojiPicker();
+
+const result = await emojiPicker.present();
+if (!result.cancelled) {
+  console.log(result.emoji);
+}
+```
+
 ## Multilingual Search
 
 English search keywords are always included (built into `emojis.json`). To enable search in additional languages, you need to bundle the corresponding locale files.
