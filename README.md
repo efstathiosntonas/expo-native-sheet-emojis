@@ -163,7 +163,9 @@ if (!result.cancelled) {
 
 ## Multilingual Search
 
-English search keywords are always included (built into `emojis.json`). To enable search in additional languages, you need to bundle the corresponding locale files.
+English search keywords are always included (built into `emojis.json`). No additional setup is needed for English-only apps.
+
+To enable search in additional languages, use the Expo config plugin to select which locale files to bundle. **Nothing is bundled by default** -- you opt in to the locales you need.
 
 ### Expo (managed or prebuild)
 
@@ -177,38 +179,49 @@ Configure the plugin in your `app.json` or `app.config.js`:
 }
 ```
 
-The config plugin copies only the selected locale files into your native bundles at prebuild time.
+Then run `npx expo prebuild --clean`. The plugin copies only the selected locale files into your native bundles.
 
-### Bare React Native (without Expo config plugins)
+### Bare React Native
 
-Manually copy the locale files you need from the package's `translations/` directory into your native projects:
+**Android** requires no setup -- the module's Gradle build automatically copies all translation files at build time.
 
-**iOS:** Copy the desired `.json` files into your Xcode project, placing them alongside the module's `emojis.json`. The native code loads all `.json` files found in the `translations/` bundle directory.
+**iOS** requires a `pre_install` hook in your `Podfile`. This copies locale files into the module's bundle during `pod install`:
 
-```bash
-# From your project root
-cp node_modules/expo-native-sheet-emojis/translations/es.json ios/translations/
-cp node_modules/expo-native-sheet-emojis/translations/fr.json ios/translations/
+**All locales:**
+```ruby
+pre_install do |installer|
+  emoji_sheet_pod = File.join(__dir__, '..', 'node_modules', 'expo-native-sheet-emojis')
+  source = File.join(emoji_sheet_pod, 'translations')
+  target = File.join(emoji_sheet_pod, 'ios', 'translations')
+  if File.directory?(source)
+    FileUtils.mkdir_p(target)
+    FileUtils.cp(Dir.glob(File.join(source, '*.json')), target)
+  end
+end
 ```
 
-Make sure the `translations/` folder is added to your Xcode project as a folder reference and included in the "Copy Bundle Resources" build phase.
-
-**Android:** Copy the files into your app's assets:
-
-```bash
-mkdir -p android/app/src/main/assets/translations
-cp node_modules/expo-native-sheet-emojis/translations/es.json android/app/src/main/assets/translations/
-cp node_modules/expo-native-sheet-emojis/translations/fr.json android/app/src/main/assets/translations/
+**Selected locales only:**
+```ruby
+pre_install do |installer|
+  emoji_locales = ['es', 'fr', 'de', 'ja']
+  emoji_sheet_pod = File.join(__dir__, '..', 'node_modules', 'expo-native-sheet-emojis')
+  source = File.join(emoji_sheet_pod, 'translations')
+  target = File.join(emoji_sheet_pod, 'ios', 'translations')
+  if File.directory?(source)
+    FileUtils.mkdir_p(target)
+    files = emoji_locales.map { |l| File.join(source, "#{l}.json") }.select { |f| File.exist?(f) }
+    FileUtils.cp(files, target)
+  end
+end
 ```
+
+If you already have a `pre_install` block, add the emoji translation snippet inside it. Run `pod install` after updating.
 
 ### Supported Locales
 
 `ca`, `cs`, `de`, `el`, `en`, `es`, `fi`, `fr`, `hi`, `hu`, `it`, `ja`, `ko`, `nl`, `pl`, `pt`, `ru`, `sv`, `tr`, `uk`, `zh`
 
-**Bundle size impact:** The base emoji data (`emojis.json`) adds ~300KB to your app.
-Each locale file adds 64-185KB depending on the language (all 21 locales total ~2.3MB). 
-Only bundle the locales your app actually needs -- English-only apps pay zero extra since English keywords are already in the base data.
-The config plugin ensures only selected locales are included in the native build.
+**Bundle size impact:** The base emoji data (`emojis.json`) adds ~300KB to your app. Each locale file adds 64-185KB depending on the language (all 21 locales total ~2.3MB). Only bundle the locales your app actually needs.
 
 ### Custom Translations
 

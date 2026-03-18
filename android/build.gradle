@@ -29,6 +29,14 @@ android {
         versionName "1.0.0"
     }
 
+    // Copy translation files from package root into module assets at build time.
+    // This means Android consumers get all translations automatically — no manual setup.
+    task copyTranslations(type: Copy) {
+        from "${projectDir}/../translations"
+        into "${projectDir}/src/main/assets/translations"
+    }
+    preBuild.dependsOn copyTranslations
+
     lintOptions {
         abortOnError false
     }

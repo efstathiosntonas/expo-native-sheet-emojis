@@ -327,39 +327,47 @@ class EmojiSheetUIView: UIView,
         let bundle = Bundle(for: EmojiSheetUIView.self)
         var merged: [String: [String]] = [:]
 
-        // Try translations directory (per-locale files from config plugin)
-        if let translationsURL = bundle.url(forResource: "translations", withExtension: nil) ??
-           bundle.urls(forResourcesWithExtension: "json", subdirectory: "translations")?.first.map({ $0.deletingLastPathComponent() }) {
-            // Load all .json files in translations/
+        // Translation files are copied into ios/translations/ by the config plugin.
+        // The podspec bundles translations/*.json into the module's resource bundle.
+        // CocoaPods may copy them flat (root level) or preserve the subdirectory.
+        // We check both locations.
+
+        // 1. Check translations/ subdirectory
+        if let translationsURL = bundle.url(forResource: "translations", withExtension: nil) {
             if let urls = try? FileManager.default.contentsOfDirectory(at: translationsURL, includingPropertiesForKeys: nil)
                 .filter({ $0.pathExtension == "json" }) {
                 for url in urls {
-                    if let data = try? Data(contentsOf: url),
-                       let dict = try? JSONSerialization.jsonObject(with: data) as? [String: [String]] {
-                        for (key, value) in dict {
-                            if var existing = merged[key] {
-                                existing.append(contentsOf: value)
-                                merged[key] = existing
-                            } else {
-                                merged[key] = value
-                            }
-                        }
-                    }
+                    Self.mergeKeywords(from: url, into: &merged)
                 }
             }
         }
 
-        // Fallback: try flat "all.json" (legacy format)
+        // 2. Fallback: check flat bundle root for known locale files
         if merged.isEmpty {
-            let url = bundle.url(forResource: "all", withExtension: "json")
-                ?? bundle.url(forResource: "all", withExtension: "json", subdirectory: "translations")
-            if let url, let data = try? Data(contentsOf: url),
-               let dict = try? JSONSerialization.jsonObject(with: data) as? [String: [String]] {
-                return dict
+            let locales = ["ca", "cs", "de", "el", "en", "es", "fi", "fr", "hi", "hu",
+                           "it", "ja", "ko", "nl", "pl", "pt", "ru", "sv", "tr", "uk", "zh"]
+            for locale in locales {
+                if let url = bundle.url(forResource: locale, withExtension: "json") {
+                    Self.mergeKeywords(from: url, into: &merged)
+                }
             }
         }
 
         return merged
+    }
+
+    private static func mergeKeywords(from url: URL, into merged: inout [String: [String]]) {
+        guard let data = try? Data(contentsOf: url),
+              let dict = try? JSONSerialization.jsonObject(with: data) as? [String: [String]]
+        else { return }
+        for (key, value) in dict {
+            if var existing = merged[key] {
+                existing.append(contentsOf: value)
+                merged[key] = existing
+            } else {
+                merged[key] = value
+            }
+        }
     }
 
     func loadDataAsync() {

@@ -233,30 +233,21 @@ const darkTheme: EmojiSheetTheme = {
 
 ## Multilingual Search
 
-English keywords are always included. For additional languages, configure the Expo plugin:
+English keywords are always included. No extra locales are bundled by default -- opt in per platform:
 
+**Expo (managed/prebuild):** Config plugin in app.json:
 ```json
-{
-  "plugins": [
-    ["expo-native-sheet-emojis", { "searchLocales": ["es", "fr", "de", "ja"] }]
-  ]
-}
+{ "plugins": [["expo-native-sheet-emojis", { "searchLocales": ["es", "fr", "de", "ja"] }]] }
 ```
+Run `npx expo prebuild --clean` after configuring.
 
-For bare React Native (without config plugins), manually copy locale files:
-
-```bash
-# iOS
-cp node_modules/expo-native-sheet-emojis/translations/es.json ios/translations/
-
-# Android
-mkdir -p android/app/src/main/assets/translations
-cp node_modules/expo-native-sheet-emojis/translations/es.json android/app/src/main/assets/translations/
-```
+**Bare React Native:**
+- Android: No setup needed -- Gradle copies all translations automatically at build time.
+- iOS: Add a `pre_install` hook in your Podfile to copy locale files during `pod install`. See README for snippet.
 
 Supported locales: ca, cs, de, el, en, es, fi, fr, hi, hu, it, ja, ko, nl, pl, pt, ru, sv, tr, uk, zh
 
-Each locale adds ~60-190KB to the bundle.
+Each locale adds ~64-185KB. All 21 locales total ~2.3MB.
 
 ## Emoji IDs
 
