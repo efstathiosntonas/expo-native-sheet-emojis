@@ -1,0 +1,31 @@
+# Changelog
+
+## [1.0.1](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/1.0.0...v1.0.1) (2026-03-18)
+
+### Chores
+
+* add release-it configuration for automated releases ([ae8d4dc](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/ae8d4dc2602aa4ed058c944f605f0e9966ad173c))
+* remove translations from native folders ([13242dc](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/13242dcfc3acd4a592251e46b8642819facac27e))
+* streamline multilingual setup ([29712fd](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/29712fd9195b6ae2cb0bf4a406002b273f0078d5))
+* update podspec homepage URL ([660565c](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/660565c11d2d1902e30b1e0e4522e43e58ccdc0c))
+* update Yarn install state ([715cf92](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/715cf92c951ddb9614051c4536500093f4108c6d))
+
+### CI
+
+* switch publish trigger to manual and remove unused env token ([a3b780d](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/a3b780d3bae9b0cfe1e810fbb5824ddf480cd9a5))
+
+## 1.0.0 (2026-03-18)
+
+### Documentation
+
+* add structured reference for AI agents in llms.txt ([cd20b13](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/cd20b1355649e5d65e9b0439794398a3f6b88cd6))
+* added hook example ([580857e](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/580857edc89acda89d775c64226f6499cdc87289))
+* clarify bundle size impact and locale selection in README ([7248fc0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/7248fc0b0f0dd3c9e4caa40a432138e729c23454))
+
+### Chores
+
+* initial commit ([5c6004b](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/5c6004b359854bad3aacd50c2706fdc7563f88c7))
+
+## [1.0.3](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/1.0.0...v1.0.3) (2026-03-18)
+
+## 1.0.0 (2026-03-18)
