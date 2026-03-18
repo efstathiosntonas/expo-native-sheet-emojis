@@ -1,0 +1,297 @@
+# expo-native-sheet-emojis
+
+> A fully native emoji picker bottom sheet for React Native (iOS + Android). 60+ FPS, 1900+ emojis (Unicode v16.0), relevance-ranked search across 21 languages powered by Unicode CLDR.
+
+Full documentation: https://github.com/efstathiosntonas/expo-native-sheet-emojis/blob/main/README.md
+
+## Installation
+
+```bash
+# Expo
+npx expo install expo-native-sheet-emojis
+
+# Bare React Native
+yarn add expo-native-sheet-emojis
+cd ios && pod install
+```
+
+Requires: expo >=54.0.0, react >=18.3.1, react-native >=0.81.0
+
+## Exports
+
+```typescript
+import {
+  EmojiSheetModule,       // imperative present()/dismiss()
+  EmojiSheetView,         // declarative <EmojiSheetView /> component
+  lightTheme,             // light theme preset
+  darkTheme,              // dark theme preset
+} from 'expo-native-sheet-emojis';
+
+// All types are also exported:
+import type {
+  EmojiSheetTheme,
+  EmojiSheetPresentOptions,
+  EmojiSheetResult,
+  EmojiSheetTranslations,
+  EmojiSheetViewProps,
+  EmojiCategory,
+} from 'expo-native-sheet-emojis';
+```
+
+## Complete TypeScript Types
+
+```typescript
+type EmojiSheetTheme = {
+  // Required
+  backgroundColor: string;            // main picker background
+  searchBarBackgroundColor: string;    // search input background
+  textColor: string;                   // primary text color
+  textSecondaryColor: string;          // secondary/label text color
+  accentColor: string;                 // highlights, active states
+  dividerColor: string;                // divider lines
+
+  // Optional (have sensible defaults)
+  searchTextColor?: string;            // text inside search input (defaults to textColor)
+  placeholderTextColor?: string;       // placeholder in search (defaults to textSecondaryColor)
+  selectionColor?: string;             // cursor/highlight color
+  categoryIconColor?: string;          // unselected category icons (defaults to textSecondaryColor)
+  categoryActiveIconColor?: string;    // selected category icon (defaults to accentColor)
+  categoryActiveBackgroundColor?: string; // circle behind selected icon (defaults to dividerColor)
+  handleColor?: string;                // sheet drag handle bar
+  categoryBarBackgroundColor?: string; // category bar background (defaults to backgroundColor)
+};
+
+type EmojiCategory =
+  | 'frequently_used'
+  | 'smileys_emotion'
+  | 'people_body'
+  | 'animals_nature'
+  | 'food_drink'
+  | 'travel_places'
+  | 'activities'
+  | 'objects'
+  | 'symbols'
+  | 'flags';
+
+type EmojiSheetTranslations = {
+  searchPlaceholder?: string;                           // default: "Search emoji"
+  noResultsText?: string;                               // default: "No emojis found"
+  categoryNames?: Partial<Record<EmojiCategory, string>>; // localized category tab names
+};
+
+type EmojiSheetPresentOptions = {
+  theme?: EmojiSheetTheme | 'dark' | 'light';  // default: 'light'
+  translations?: EmojiSheetTranslations;
+  snapPoints?: [number, number];               // default: [0.5, 1.0] -- screen fractions
+  categoryBarPosition?: 'top' | 'bottom';      // default: 'top'
+  columns?: number;                            // default: 7
+  emojiSize?: number;                          // default: 32 (points)
+  recentLimit?: number;                        // default: 30
+  showSearch?: boolean;                        // default: true
+  showRecents?: boolean;                       // default: true
+  enableSkinTones?: boolean;                   // default: true
+  gestureEnabled?: boolean;                    // default: true (swipe-to-dismiss)
+  backdropOpacity?: number;                    // default: 0.22
+  excludeEmojis?: string[];                    // default: [] -- emoji IDs to hide
+};
+
+type EmojiSheetResult =
+  | { emoji: string; cancelled?: never }       // user selected an emoji
+  | { cancelled: true; emoji?: never };        // user dismissed without selecting
+
+type EmojiSheetViewProps = ViewProps & {
+  onEmojiSelected: (emoji: string) => void;    // required callback
+  theme?: EmojiSheetTheme | 'dark' | 'light';
+  translations?: EmojiSheetTranslations;
+  categoryBarPosition?: 'top' | 'bottom';
+  columns?: number;
+  emojiSize?: number;
+  recentLimit?: number;
+  showSearch?: boolean;
+  showRecents?: boolean;
+  enableSkinTones?: boolean;
+  excludeEmojis?: string[];
+};
+```
+
+## Imperative API
+
+Present a native bottom sheet and await the user's selection:
+
+```typescript
+import { EmojiSheetModule } from 'expo-native-sheet-emojis';
+
+const result = await EmojiSheetModule.present({
+  theme: 'dark',
+  categoryBarPosition: 'bottom',
+  excludeEmojis: ['pile_of_poo', 'thumbs_down'],
+  translations: {
+    searchPlaceholder: 'Find an emoji...',
+    noResultsText: 'Nothing found',
+    categoryNames: {
+      smileys_emotion: 'Smileys',
+      people_body: 'People',
+    },
+  },
+});
+
+if (!result.cancelled) {
+  console.log('Selected:', result.emoji); // e.g. "😀"
+}
+
+// Programmatic dismiss
+await EmojiSheetModule.dismiss();
+```
+
+## Declarative API
+
+Embed the emoji picker inline in your component tree:
+
+```tsx
+import { EmojiSheetView } from 'expo-native-sheet-emojis';
+
+<EmojiSheetView
+  style={{ flex: 1 }}
+  theme="light"
+  onEmojiSelected={(emoji) => console.log(emoji)}
+  columns={7}
+  emojiSize={32}
+  showSearch={true}
+  showRecents={true}
+  enableSkinTones={true}
+  excludeEmojis={['pile_of_poo']}
+  categoryBarPosition="top"
+  translations={{
+    searchPlaceholder: 'Search...',
+    noResultsText: 'No results',
+  }}
+/>
+```
+
+## Theming
+
+```typescript
+import { EmojiSheetModule, lightTheme, darkTheme } from 'expo-native-sheet-emojis';
+
+// Use presets
+await EmojiSheetModule.present({ theme: 'dark' });
+await EmojiSheetModule.present({ theme: darkTheme });
+
+// Custom theme object
+await EmojiSheetModule.present({
+  theme: {
+    backgroundColor: '#1A1A2E',
+    searchBarBackgroundColor: '#2A2F39',
+    textColor: '#FFFFFF',
+    textSecondaryColor: '#999999',
+    accentColor: '#EA4578',
+    dividerColor: '#3A3A4A',
+    categoryIconColor: '#808080',
+    categoryActiveIconColor: '#EA4578',
+    categoryActiveBackgroundColor: '#3A3A4A',
+    handleColor: '#666666',
+    categoryBarBackgroundColor: '#1A1A2E',
+  },
+});
+```
+
+### Light Theme Preset Values
+
+```typescript
+const lightTheme: EmojiSheetTheme = {
+  backgroundColor: '#FFFFFF',
+  searchBarBackgroundColor: '#F0F0F0',
+  textColor: '#000000',
+  textSecondaryColor: '#808080',
+  accentColor: '#EA4578',
+  dividerColor: '#E0E0E0',
+  categoryIconColor: '#666666',
+  categoryActiveIconColor: '#EA4578',
+  categoryActiveBackgroundColor: '#E0E0E0',
+  handleColor: '#B8B8B8',
+  categoryBarBackgroundColor: '#FFFFFF',
+};
+```
+
+### Dark Theme Preset Values
+
+```typescript
+const darkTheme: EmojiSheetTheme = {
+  backgroundColor: '#1A1A2E',
+  searchBarBackgroundColor: '#2A2F39',
+  textColor: '#FFFFFF',
+  textSecondaryColor: '#999999',
+  accentColor: '#EA4578',
+  dividerColor: '#3A3A4A',
+  categoryIconColor: '#808080',
+  categoryActiveIconColor: '#EA4578',
+  categoryActiveBackgroundColor: '#3A3A4A',
+  handleColor: '#666666',
+  categoryBarBackgroundColor: '#1A1A2E',
+};
+```
+
+## Multilingual Search
+
+English keywords are always included. For additional languages, configure the Expo plugin:
+
+```json
+{
+  "plugins": [
+    ["expo-native-sheet-emojis", { "searchLocales": ["es", "fr", "de", "ja"] }]
+  ]
+}
+```
+
+For bare React Native (without config plugins), manually copy locale files:
+
+```bash
+# iOS
+cp node_modules/expo-native-sheet-emojis/translations/es.json ios/translations/
+
+# Android
+mkdir -p android/app/src/main/assets/translations
+cp node_modules/expo-native-sheet-emojis/translations/es.json android/app/src/main/assets/translations/
+```
+
+Supported locales: ca, cs, de, el, en, es, fi, fr, hi, hu, it, ja, ko, nl, pl, pt, ru, sv, tr, uk, zh
+
+Each locale adds ~60-190KB to the bundle.
+
+## Emoji IDs
+
+Emoji IDs are snake_case derived from the Unicode name. Used in `excludeEmojis` and returned in the native event data.
+
+Examples: `grinning_face`, `thumbs_up`, `thumbs_down`, `pile_of_poo`, `red_heart`, `rocket`, `fire`, `party_popper`, `waving_hand`, `thinking_face`
+
+## Category Bar Position
+
+- **top** (default): Inline strip below search bar, mirrors native keyboard layout
+- **bottom**: Floating rounded pill with blur backdrop (iOS) / elevation shadow (Android), hides during search
+
+## Search Behavior
+
+Search is relevance-ranked with the following scoring:
+
+| Score | Match Type |
+|-|-|
+| 100 | Exact emoji name match |
+| 90 | Emoji name starts with query |
+| 80 | Exact keyword match |
+| 70 | Keyword starts with query |
+| 50 | Emoji name contains query |
+| 30 | Keyword contains query |
+| 10 | Localized keyword contains query |
+
+Search runs on a background thread. Results scroll to top automatically.
+
+## Key Behaviors
+
+- Frequently used emojis persist across app launches (UserDefaults on iOS, SharedPreferences on Android)
+- Skin tone preferences persist per emoji
+- Frequently used section only appears when there are actual entries
+- Bottom floating pill hides during search (keyboard visible)
+- All data loading and search runs on background threads
+- Emoji data and translation keywords are cached in memory after first load
+- Clear (X) button appears in search bar when text is entered
+- Custom translation files can be created as JSON: `{ "emoji_char": ["keyword1", "keyword2"] }`

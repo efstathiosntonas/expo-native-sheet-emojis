@@ -310,9 +310,9 @@ Set via `categoryBarPosition: 'top'` or `categoryBarPosition: 'bottom'` in the o
 | gestureEnabled | `boolean` | `true` | Swipe to dismiss |
 | backdropOpacity | `number` | `0.22` | Backdrop opacity |
 
-## Platform Videos
+## LLM / AI Agent Reference
 
-Platform demo videos coming soon.
+If you're an AI agent or using an LLM to integrate this module, see [llms.txt](llms.txt) for a concise, structured reference with all types, APIs, and usage patterns.
 
 ## Contributing
 
