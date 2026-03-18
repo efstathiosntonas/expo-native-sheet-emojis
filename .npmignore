@@ -4,3 +4,16 @@ example/
 *.tsbuildinfo
 .DS_Store
 .expo/
+android/build/
+ios/build/
+.idea/
+.yarn/
+.yarnrc.yml
+yarn.lock
+lefthook.yml
+.prettierrc
+eslint.config.mjs
+CONTRIBUTING.md
+CHANGELOG.md
+.release-it.json
+.gitkeep
