@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.2](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.0.1...v1.0.2) (2026-03-18)
+
+### Chores
+
+* add release-it hook to update podspec version after bump ([d727f54](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/d727f541464d7fd25f418b3784eb165482725a9f))
+* bump podspec version to 1.0.1 ([460e788](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/460e7880c3b1a984c6fef6188db238c8f76052e6))
+* bump podspec version to 1.0.1 ([9eab822](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/9eab8224f809e57e31fae92de38af554debadded))
+* took out the garbage from npm package ([1a91d1a](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/1a91d1a80a8edb46285b9602ed5cb06be8a07d12))
+* update README for bare React Native setup instructions ([f97cf99](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/f97cf9931480d3be1706a31c9e9c355adb1fbbd1))
+
 ## [1.0.1](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/1.0.0...v1.0.1) (2026-03-18)
 
 ### Chores

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name           = 'EmojiSheetModule'
-  s.version        = '1.0.1'
+  s.version        = '1.0.2'
   s.summary        = 'Native emoji picker bottom sheet for React Native'
   s.description    = 'A fully native iOS/Android emoji picker presented in a bottom sheet with search, skin tones, and theming support.'
   s.author         = ''
