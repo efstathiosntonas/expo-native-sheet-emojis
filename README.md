@@ -144,7 +144,10 @@ cp node_modules/expo-native-sheet-emojis/translations/fr.json android/app/src/ma
 
 `ca`, `cs`, `de`, `el`, `en`, `es`, `fi`, `fr`, `hi`, `hu`, `it`, `ja`, `ko`, `nl`, `pl`, `pt`, `ru`, `sv`, `tr`, `uk`, `zh`
 
-Each locale file adds roughly 60-190KB to your app bundle depending on the language.
+**Bundle size impact:** The base emoji data (`emojis.json`) adds ~300KB to your app.
+Each locale file adds 64-185KB depending on the language (all 21 locales total ~2.3MB). 
+Only bundle the locales your app actually needs -- English-only apps pay zero extra since English keywords are already in the base data.
+The config plugin ensures only selected locales are included in the native build.
 
 ### Custom Translations
 
