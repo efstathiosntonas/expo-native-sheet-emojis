@@ -107,7 +107,7 @@ class EmojiSearchBar(
                     onSearchChanged(s?.toString()?.trim() ?: "")
                 }
                 pendingRunnable = runnable
-                handler.postDelayed(runnable, 300)
+                handler.postDelayed(runnable, 500)
             }
         })
     }
