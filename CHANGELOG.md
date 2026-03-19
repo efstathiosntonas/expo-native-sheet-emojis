@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.0.3...v1.1.0) (2026-03-19)
+
+### Features
+
+* added a11y support ([f180335](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/f180335b40cb013e0162eb9c7b35221ac1ff7407))
+
 ## [1.0.3](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.0.2...v1.0.3) (2026-03-18)
 
 ### Chores
