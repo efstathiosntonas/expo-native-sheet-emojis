@@ -194,6 +194,9 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
         }
 
         cell.configure(emoji: displayEmoji, fontSize: emojiSize)
+        cell.isAccessibilityElement = true
+        cell.accessibilityLabel = item.name
+        cell.accessibilityTraits = .button
 
         // Add long press for tone-enabled emojis
         if enableSkinTones && item.toneEnabled {
@@ -220,6 +223,8 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
         let title = sections[indexPath.section].title
         let displayName = categoryNames[title] ?? title.replacingOccurrences(of: "_", with: " ").capitalized
         header.configure(title: displayName, theme: currentTheme)
+        header.isAccessibilityElement = true
+        header.accessibilityLabel = displayName
         return header
     }
 

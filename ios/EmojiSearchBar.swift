@@ -54,6 +54,7 @@ class EmojiSearchBar: UIView, UITextFieldDelegate {
         clearButton.setImage(UIImage(systemName: "xmark.circle.fill", withConfiguration: config), for: .normal)
         clearButton.tintColor = .gray
         clearButton.isHidden = true
+        clearButton.accessibilityLabel = "Clear search"
         clearButton.addTarget(self, action: #selector(clearTapped), for: .touchUpInside)
         containerView.addSubview(clearButton)
 

@@ -61,12 +61,23 @@ class EmojiSkinTonePicker(
             variants.add(EmojiData.applyTone(baseEmoji, tone) to tone)
         }
 
-        for ((variantEmoji, toneCodePoint) in variants) {
+        val skinToneLabels = listOf(
+            "Default skin tone",
+            "Light skin tone",
+            "Medium-light skin tone",
+            "Medium skin tone",
+            "Medium-dark skin tone",
+            "Dark skin tone"
+        )
+
+        for ((index, pair) in variants.withIndex()) {
+            val (variantEmoji, _) = pair
             val tv = AppCompatTextView(context).apply {
                 text = variantEmoji
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 28f)
                 gravity = Gravity.CENTER
                 layoutParams = LinearLayout.LayoutParams(cellSize, cellSize)
+                contentDescription = skinToneLabels[index]
                 setOnClickListener(null) // set below after popup created
             }
             container.addView(tv)

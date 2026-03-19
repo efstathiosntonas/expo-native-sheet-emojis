@@ -112,7 +112,8 @@ class EmojiCategoryStrip: UIView, UICollectionViewDataSource, UICollectionViewDe
         cell.configure(
             sfSymbol: sfSymbol,
             isSelected: isSelected,
-            theme: currentTheme
+            theme: currentTheme,
+            categoryKey: key
         )
         return cell
     }
@@ -166,10 +167,27 @@ private class CategoryCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(sfSymbol: String, isSelected: Bool, theme: EmojiSheetTheme) {
+    private static let categoryDisplayNames: [String: String] = [
+        "frequently_used": "Frequently Used",
+        "smileys_emotion": "Smileys & Emotion",
+        "people_body": "People & Body",
+        "animals_nature": "Animals & Nature",
+        "food_drink": "Food & Drink",
+        "travel_places": "Travel & Places",
+        "activities": "Activities",
+        "objects": "Objects",
+        "symbols": "Symbols",
+        "flags": "Flags",
+    ]
+
+    func configure(sfSymbol: String, isSelected: Bool, theme: EmojiSheetTheme, categoryKey: String) {
         let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .medium)
         iconView.image = UIImage(systemName: sfSymbol, withConfiguration: config)
         iconView.tintColor = isSelected ? theme.categoryActiveIconColor : theme.categoryIconColor
         circleView.backgroundColor = isSelected ? theme.categoryActiveBackgroundColor : .clear
+
+        isAccessibilityElement = true
+        accessibilityLabel = Self.categoryDisplayNames[categoryKey] ?? categoryKey.replacingOccurrences(of: "_", with: " ").capitalized
+        accessibilityTraits = isSelected ? [.button, .selected] : .button
     }
 }

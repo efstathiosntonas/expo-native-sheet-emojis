@@ -68,6 +68,15 @@ class EmojiSkinTonePicker: UIView {
         }
     }
 
+    private static let skinToneLabels: [String] = [
+        "Default skin tone",
+        "Light skin tone",
+        "Medium-light skin tone",
+        "Medium skin tone",
+        "Medium-dark skin tone",
+        "Dark skin tone",
+    ]
+
     private func createButton(emoji: String, tag: Int) -> UIButton {
         let button = UIButton(type: .system)
         button.setTitle(emoji, for: .normal)
@@ -75,6 +84,7 @@ class EmojiSkinTonePicker: UIView {
         button.tag = tag
         button.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
         button.layer.cornerRadius = 10
+        button.accessibilityLabel = Self.skinToneLabels[tag]
         return button
     }
 

@@ -71,6 +71,7 @@ class EmojiSearchBar(
                 marginEnd = clearMarginEnd
             }
             layoutParams = clearLp
+            contentDescription = "Clear search"
             setOnClickListener {
                 editText.setText("")
                 updateClearButtonVisibility()

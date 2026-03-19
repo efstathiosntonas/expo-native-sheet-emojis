@@ -128,6 +128,8 @@ class EmojiCategoryStrip(
             holder.iconView.imageTintList = ColorStateList.valueOf(tint)
             holder.bg.setColor(if (isSelected) currentTheme.categoryActiveBackgroundColor else 0x00000000)
 
+            holder.container.contentDescription = EmojiData.displayName(key)
+
             holder.container.setOnClickListener {
                 val pos = holder.bindingAdapterPosition
                 if (pos != RecyclerView.NO_POSITION) {

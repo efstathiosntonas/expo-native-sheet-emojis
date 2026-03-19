@@ -104,10 +104,12 @@ class EmojiGridAdapter(
                 val h = holder as HeaderVH
                 h.textView.text = item.title
                 h.textView.setTextColor(theme.textSecondaryColor)
+                h.textView.contentDescription = item.title
             }
             is ListItem.Emoji -> {
                 val h = holder as EmojiVH
                 h.textView.text = item.emoji
+                h.container.contentDescription = item.name
                 h.textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, emojiTextSize)
                 // Prevent theme text color from washing out color emojis
                 h.textView.setTextColor(Color.BLACK)
