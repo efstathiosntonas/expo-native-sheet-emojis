@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.4.0...v1.5.0) (2026-03-23)
+
+### Features
+
+* add enableAnimations prop to gate tap animation ([a292015](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/a292015b8155eb5e6deeaeedeb5a75aaf22943ad))
+* add scale animation on emoji tap ([9aba827](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/9aba827e27175717b50bde97b79d53f42df8eb02))
+* default enableAnimations to false, add note about embedded view usage ([d2a92bf](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/d2a92bf72e1544cd86752cf781baf055332bb12e))
+
 ## [1.4.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.3.0...v1.4.0) (2026-03-23)
 
 ### Features
