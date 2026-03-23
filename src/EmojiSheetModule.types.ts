@@ -61,6 +61,7 @@ export type EmojiSelectionListener = (event: { nativeEvent: { emoji: string } })
 
 export type EmojiSheetViewProps = ViewProps & {
   onEmojiSelected: (emoji: string) => void;
+  onDismiss?: () => void;
   theme?: EmojiSheetTheme | 'dark' | 'light' | 'system';
   translations?: EmojiSheetTranslations;
   categoryBarPosition?: 'top' | 'bottom';
@@ -77,6 +78,7 @@ export type EmojiSheetViewProps = ViewProps & {
 
 export type EmojiSheetNativeViewProps = ViewProps & {
   onEmojiSelected: EmojiSelectionListener;
+  onDismiss?: (event: { nativeEvent: {} }) => void;
   theme?: string;
   categoryBarPosition?: string;
   columns?: number;

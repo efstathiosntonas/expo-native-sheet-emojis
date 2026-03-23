@@ -306,6 +306,7 @@ A declarative React component that renders the emoji picker inline.
 | Prop | Type | Default | Description |
 |-|-|-|-|
 | onEmojiSelected | `(emoji: string) => void` | required | Called when an emoji is tapped |
+| onDismiss | `() => void` | -- | Called when the picker is dismissed (View API only) |
 | theme | `EmojiSheetTheme \| 'dark' \| 'light' \| 'system'` | `'light'` | Theme configuration |
 | translations | `EmojiSheetTranslations` | -- | Localized strings |
 | categoryBarPosition | `'top' \| 'bottom'` | `'top'` | Position of the category tab bar |
