@@ -61,7 +61,7 @@ class EmojiSheetUIView: UIView,
     var enableHaptics: Bool = true {
         didSet { gridView.enableHaptics = enableHaptics }
     }
-    var enableAnimations: Bool = true {
+    var enableAnimations: Bool = false {
         didSet { gridView.enableAnimations = enableAnimations }
     }
     var recentLimit: Int = 30

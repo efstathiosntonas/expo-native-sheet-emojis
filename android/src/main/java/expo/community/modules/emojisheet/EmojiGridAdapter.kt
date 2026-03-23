@@ -26,7 +26,7 @@ class EmojiGridAdapter(
     var emojiTextSize: Float = 32f
     var enableSkinTones: Boolean = true
     var enableHaptics: Boolean = true
-    var enableAnimations: Boolean = true
+    var enableAnimations: Boolean = false
 
     sealed class ListItem {
         data class Header(val title: String, val categoryKey: String) : ListItem()

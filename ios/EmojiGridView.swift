@@ -20,7 +20,7 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
     }
     var enableSkinTones: Bool = true
     var enableHaptics: Bool = true
-    var enableAnimations: Bool = true
+    var enableAnimations: Bool = false
 
     private lazy var selectionFeedback = UISelectionFeedbackGenerator()
     private lazy var impactFeedbackMedium = UIImpactFeedbackGenerator(style: .medium)

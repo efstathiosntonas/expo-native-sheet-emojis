@@ -91,7 +91,7 @@ type EmojiSheetPresentOptions = {
   showRecents?: boolean;                       // default: true
   enableSkinTones?: boolean;                   // default: true
   enableHaptics?: boolean;                     // default: true -- haptic feedback on tap, long-press, skin tone select
-  enableAnimations?: boolean;                  // default: true -- scale animation on emoji tap
+  enableAnimations?: boolean;                  // default: false -- scale animation on emoji tap (useful for embedded EmojiSheetView)
   gestureEnabled?: boolean;                    // default: true (swipe-to-dismiss)
   backdropOpacity?: number;                    // default: 0.22
   excludeEmojis?: string[];                    // default: [] -- emoji IDs to hide
