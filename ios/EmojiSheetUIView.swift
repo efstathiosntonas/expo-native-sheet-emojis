@@ -168,9 +168,9 @@ class EmojiSheetUIView: UIView,
         }
 
         semanticContentAttribute = attribute
-        searchBar.semanticContentAttribute = attribute
+        searchBar.applyLayoutDirection(attribute)
         categoryStrip.applyLayoutDirection(attribute)
-        gridView.semanticContentAttribute = attribute
+        gridView.applyLayoutDirection(attribute)
     }
 
     private func configureLayout() {

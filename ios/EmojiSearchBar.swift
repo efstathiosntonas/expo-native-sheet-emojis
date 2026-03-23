@@ -97,6 +97,14 @@ class EmojiSearchBar: UIView, UITextFieldDelegate {
         textField.tintColor = theme.selectionColor
     }
 
+    func applyLayoutDirection(_ attribute: UISemanticContentAttribute) {
+        semanticContentAttribute = attribute
+        containerView.semanticContentAttribute = attribute
+        textField.semanticContentAttribute = attribute
+        clearButton.semanticContentAttribute = attribute
+        textField.textAlignment = .natural
+    }
+
     @objc private func textFieldDidChange() {
         updateClearButtonVisibility()
         debounceTimer?.invalidate()

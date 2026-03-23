@@ -128,6 +128,13 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
         collectionView.reloadData()
     }
 
+    func applyLayoutDirection(_ attribute: UISemanticContentAttribute) {
+        semanticContentAttribute = attribute
+        collectionView.semanticContentAttribute = attribute
+        collectionView.collectionViewLayout.invalidateLayout()
+        collectionView.reloadData()
+    }
+
     private func indicatorStyle(for theme: EmojiSheetTheme) -> UIScrollView.IndicatorStyle {
         let backgroundBrightness = theme.backgroundColor.resolvedColor(with: traitCollection).perceivedBrightness
         return backgroundBrightness < 0.5 ? .white : .black
@@ -491,6 +498,7 @@ private class SectionHeaderView: UICollectionReusableView {
         super.init(frame: frame)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.font = .systemFont(ofSize: 14, weight: .bold)
+        titleLabel.textAlignment = .natural
         addSubview(titleLabel)
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 4),

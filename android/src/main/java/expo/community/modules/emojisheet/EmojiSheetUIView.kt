@@ -421,6 +421,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         gridAdapter.updateTheme(theme)
         recyclerView.setBackgroundColor(theme.backgroundColor)
         stickyHeaderDecoration.backgroundColor = theme.backgroundColor
+        stickyHeaderDecoration.invalidateCache()
         emptyStateLabel.setTextColor(theme.textSecondaryColor)
     }
 
@@ -436,6 +437,8 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         categoryStrip.applyLayoutDirection(dir)
         recyclerView.layoutDirection = dir
         contentFrame.layoutDirection = dir
+        stickyHeaderDecoration.invalidateCache()
+        recyclerView.invalidateItemDecorations()
         requestLayout()
     }
 
@@ -498,6 +501,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         }
 
         gridAdapter.setItems(items, sectionPositions)
+        stickyHeaderDecoration.invalidateCache()
 
         // Rebuild category keys in case frequently_used changed
         val newKeys = buildCategoryKeys()
