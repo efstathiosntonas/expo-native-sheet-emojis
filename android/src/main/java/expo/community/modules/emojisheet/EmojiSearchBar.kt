@@ -60,7 +60,22 @@ class EmojiSearchBar(
         }
         addView(searchIcon)
 
-        // Clear button (X) — hidden until text is entered
+        editText = EditText(context).apply {
+            setBackgroundColor(0x00000000)
+            hint = "Search emoji"
+            setSingleLine(true)
+            textDirection = View.TEXT_DIRECTION_LOCALE
+            textAlignment = View.TEXT_ALIGNMENT_VIEW_START
+            imeOptions = EditorInfo.IME_ACTION_SEARCH
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+            setPadding((4 * density).toInt(), 0, clearSize + clearMarginEnd, 0)
+            val etLp = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+            etLp.marginStart = iconWidth
+            layoutParams = etLp
+        }
+        addView(editText)
+
+        // Add the clear button after the EditText so it stays on top and wins taps.
         clearButton = TextView(context).apply {
             text = "\u2715"
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
@@ -80,21 +95,6 @@ class EmojiSearchBar(
             }
         }
         addView(clearButton)
-
-        editText = EditText(context).apply {
-            setBackgroundColor(0x00000000)
-            hint = "Search emoji"
-            setSingleLine(true)
-            textDirection = View.TEXT_DIRECTION_LOCALE
-            textAlignment = View.TEXT_ALIGNMENT_VIEW_START
-            imeOptions = EditorInfo.IME_ACTION_SEARCH
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
-            setPadding((4 * density).toInt(), 0, clearSize + clearMarginEnd, 0)
-            val etLp = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-            etLp.marginStart = iconWidth
-            layoutParams = etLp
-        }
-        addView(editText)
 
         editText.setOnFocusChangeListener { _, hasFocus ->
             onFocusChanged?.invoke(hasFocus)
