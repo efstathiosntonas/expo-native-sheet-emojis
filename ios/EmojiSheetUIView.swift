@@ -80,9 +80,10 @@ class EmojiSheetUIView: UIView,
     private var frequentlyUsedSection: EmojiSection?
     private var localizedKeywords: [String: [String]] = [:]
     private var currentSearchText: String?
-    // Search runs on a background queue to avoid blocking the UI while iterating
-    // 1900+ emojis with keyword matching. The generation counter ensures stale
-    // search results from previous keystrokes are discarded before updating the grid.
+    private var loadTask: Task<Void, Never>?
+    private var searchTask: Task<Void, Never>?
+    // Search work is cancellable. The generation counter remains as a lightweight
+    // secondary guard so stale results never apply after a newer query wins.
     private var searchGeneration: Int = 0
 
     private let searchBar = EmojiSearchBar()
@@ -128,6 +129,11 @@ class EmojiSheetUIView: UIView,
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        loadTask?.cancel()
+        searchTask?.cancel()
     }
 
     // MARK: - Setup
@@ -332,21 +338,15 @@ class EmojiSheetUIView: UIView,
 
     // MARK: - Data Loading (cached across instances)
 
-    // Emoji data + translation keywords are parsed once on a serial background queue
-    // and cached for the app's lifetime. The serial queue prevents concurrent warmCache()
-    // and loadDataAsync() from racing on the same static vars.
-    private static let cacheQueue = DispatchQueue(label: "EmojiSheetCache")
-    private static var cachedSections: [EmojiSection]?
-    private static var cachedKeywords: [String: [String]]?
-    static var hasCachedData: Bool { cacheQueue.sync { cachedSections != nil && cachedKeywords != nil } }
+    private static let dataCache = EmojiDataCache.shared
+    static var hasCachedData: Bool { dataCache.hasCachedData }
 
     static func warmCache() {
-        cacheQueue.async {
-            guard cachedSections == nil || cachedKeywords == nil else { return }
-            let sections = parseEmojiJSON()
-            let keywords = loadAllKeywords()
-            cachedSections = sections
-            cachedKeywords = keywords
+        dataCache.warm {
+            EmojiDataSnapshot(
+                sections: parseEmojiJSON(),
+                keywords: loadAllKeywords()
+            )
         }
     }
 
@@ -398,23 +398,20 @@ class EmojiSheetUIView: UIView,
     }
 
     func loadDataAsync() {
-        let cached = Self.cacheQueue.sync { (Self.cachedSections, Self.cachedKeywords) }
-        if let sections = cached.0, let keywords = cached.1 {
-            self.allSections = sections
-            self.localizedKeywords = keywords
-            self.rebuildSections(searchText: nil)
-            return
-        }
+        loadTask?.cancel()
+        loadTask = Task { [weak self] in
+            let snapshot = await Self.dataCache.load {
+                EmojiDataSnapshot(
+                    sections: Self.parseEmojiJSON(),
+                    keywords: Self.loadAllKeywords()
+                )
+            }
 
-        Self.cacheQueue.async { [weak self] in
-            guard let self else { return }
-            let sections = Self.cachedSections ?? Self.parseEmojiJSON()
-            let keywords = Self.cachedKeywords ?? Self.loadAllKeywords()
-            Self.cachedSections = sections
-            Self.cachedKeywords = keywords
-            DispatchQueue.main.async {
-                self.allSections = sections
-                self.localizedKeywords = keywords
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                guard let self, !Task.isCancelled else { return }
+                self.allSections = snapshot.sections
+                self.localizedKeywords = snapshot.keywords
                 self.rebuildSections(searchText: nil)
             }
         }
@@ -471,10 +468,6 @@ class EmojiSheetUIView: UIView,
         }
     }
 
-    private func loadLocalizedKeywords() -> [String: [String]] {
-        return Self.loadAllKeywords()
-    }
-
     private var filteredAllSections: [EmojiSection] {
         guard !excludeEmojis.isEmpty else { return allSections }
         return allSections.map { section in
@@ -494,6 +487,7 @@ class EmojiSheetUIView: UIView,
 
     private func rebuildSections(searchText: String?) {
         currentSearchText = searchText
+        searchTask?.cancel()
 
         guard let search = searchText, !search.isEmpty else {
             searchGeneration += 1
@@ -524,15 +518,15 @@ class EmojiSheetUIView: UIView,
         let sections = filteredAllSections
         let keywords = localizedKeywords
 
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            guard let self else { return }
-            let searchVariants = self.normalizedSearchVariants(search)
+        searchTask = Task(priority: .userInitiated) { [weak self, sections, keywords, search, generation] in
+            let searchVariants = Self.normalizedSearchVariants(search)
             var scored: [(item: EmojiItem, score: Int)] = []
 
             for section in sections {
-                guard generation == self.searchGeneration else { return }
+                if Task.isCancelled { return }
                 for item in section.data {
-                    let score = self.relevanceScore(
+                    if Task.isCancelled { return }
+                    let score = Self.relevanceScore(
                         item: item,
                         searchVariants: searchVariants,
                         localizedKeywords: keywords
@@ -543,13 +537,12 @@ class EmojiSheetUIView: UIView,
                 }
             }
 
-            // Sort by relevance score descending, then by original order for ties
             scored.sort { $0.score > $1.score }
             let matchedItems = scored.map { $0.item }
 
-            guard generation == self.searchGeneration else { return }
-            DispatchQueue.main.async { [weak self] in
-                guard let self, generation == self.searchGeneration else { return }
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                guard let self, !Task.isCancelled, generation == self.searchGeneration else { return }
                 var resultSections: [EmojiSection] = []
                 if !matchedItems.isEmpty {
                     resultSections.append(EmojiSection(title: "search_results", data: matchedItems))
@@ -574,7 +567,7 @@ class EmojiSheetUIView: UIView,
     // 100 = exact name match, 90 = name starts with, 80 = exact keyword,
     // 70 = keyword starts with, 50 = name contains, 30 = keyword contains,
     // 10 = localized keyword contains. Returns 0 for no match.
-    private func relevanceScore(
+    private static func relevanceScore(
         item: EmojiItem,
         searchVariants: [String],
         localizedKeywords: [String: [String]]
@@ -630,7 +623,7 @@ class EmojiSheetUIView: UIView,
             return true
         }
 
-        return normalizedSearchVariants(originalText)
+        return Self.normalizedSearchVariants(originalText)
             .contains { candidateVariant in
                 candidateVariant != normalizedText &&
                     searchVariants.contains(where: { candidateVariant.contains($0) })
@@ -677,7 +670,7 @@ class EmojiSheetUIView: UIView,
         UserDefaults.standard.set(dict, forKey: Self.frequentlyUsedKey)
     }
 
-    private func normalizeSearchText(_ text: String) -> String {
+    private static func normalizeSearchText(_ text: String) -> String {
         text
             .precomposedStringWithCompatibilityMapping
             .folding(
@@ -688,7 +681,7 @@ class EmojiSheetUIView: UIView,
             .lowercased(with: .current)
     }
 
-    private func normalizedSearchVariants(_ text: String) -> [String] {
+    private static func normalizedSearchVariants(_ text: String) -> [String] {
         let normalized = normalizeSearchText(text)
         let transliterated = text.applyingTransform(.toLatin, reverse: false)
             .map(normalizeSearchText)

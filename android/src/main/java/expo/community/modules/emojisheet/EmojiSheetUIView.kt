@@ -12,11 +12,19 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.text.Normalizer
 import java.util.Locale
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
 
 class EmojiSheetUIView(context: Context) : LinearLayout(context) {
 
@@ -26,23 +34,29 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         private const val FREQ_DAY_SUFFIX = "_day"
         private const val FREQ_TIME_SUFFIX = "_time"
         private val COMBINING_MARKS_REGEX = "\\p{Mn}+".toRegex()
-        // Emoji data + translation keywords are parsed once on a background thread
-        // and cached for the app's lifetime. The cacheLock prevents concurrent warmCache()
-        // and loadDataAsync() from parsing the same data twice.
-        private val cacheLock = Any()
+        private val cacheScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        private val cacheMutex = Mutex()
         @Volatile
         private var cachedData: Pair<List<EmojiCategory>, Map<String, List<String>>>? = null
 
         fun warmCache(context: Context) {
             if (cachedData != null) return
-            Thread {
-                synchronized(cacheLock) {
-                    if (cachedData != null) return@Thread
-                    val categories = EmojiData.loadCategories(context)
-                    val keywords = loadAllKeywords(context)
-                    cachedData = Pair(categories, keywords)
-                }
-            }.start()
+            val appContext = context.applicationContext
+            cacheScope.launch {
+                loadCachedData(appContext)
+            }
+        }
+
+        private suspend fun loadCachedData(context: Context): Pair<List<EmojiCategory>, Map<String, List<String>>> {
+            cachedData?.let { return it }
+
+            return cacheMutex.withLock {
+                cachedData?.let { return it }
+
+                val categories = EmojiData.loadCategories(context)
+                val keywords = loadAllKeywords(context)
+                Pair(categories, keywords).also { cachedData = it }
+            }
         }
 
         private fun loadAllKeywords(context: Context): Map<String, List<String>> {
@@ -120,6 +134,9 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
     private var velocityTracker: VelocityTracker? = null
     private var topPullStartY: Float? = null
     private val topPullActivationThresholdPx = 24f * context.resources.displayMetrics.density
+    private val viewScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private var loadJob: Job? = null
+    private var searchJob: Job? = null
 
     init {
         orientation = VERTICAL
@@ -415,34 +432,20 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         set(value) { field = value; if (value != null) emptyStateLabel.text = value }
 
     fun loadDataAsync() {
-        val cached = cachedData
-        if (cached != null) {
-            allCategories = cached.first
-            localizedKeywords = cached.second
-            allCategoryKeys = buildCategoryKeys()
-            rebuildCategoryStrip()
-            buildAndSetItems()
-            return
-        }
-
-        Thread {
-            val data = synchronized(cacheLock) {
-                cachedData ?: run {
-                    val categories = EmojiData.loadCategories(context)
-                    val keywords = loadLocalizedKeywords()
-                    Pair(categories, keywords).also { cachedData = it }
-                }
+        loadJob?.cancel()
+        val appContext = context.applicationContext
+        loadJob = viewScope.launch {
+            val data = withContext(Dispatchers.Default) {
+                loadCachedData(appContext)
             }
             val categories = data.first
             val keywords = data.second
-            post {
-                allCategories = categories
-                localizedKeywords = keywords
-                allCategoryKeys = buildCategoryKeys()
-                rebuildCategoryStrip()
-                buildAndSetItems()
-            }
-        }.start()
+            allCategories = categories
+            localizedKeywords = keywords
+            allCategoryKeys = buildCategoryKeys()
+            rebuildCategoryStrip()
+            buildAndSetItems()
+        }
     }
 
     fun updateTheme(theme: String) {
@@ -594,17 +597,14 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         }
     }
 
-    // Search runs on a single background thread to avoid blocking the UI.
-    // A single-thread executor ensures only one search runs at a time —
-    // new keystrokes cancel the previous task via Future.cancel(true)
-    // and the generation counter provides a secondary guard against stale results.
+    // Search runs on a cancellable coroutine job. The generation counter remains
+    // as a small secondary guard so stale results cannot apply after a newer query.
     private var searchGeneration = 0
-    private val searchExecutor: ExecutorService = Executors.newSingleThreadExecutor()
-    private var searchFuture: Future<*>? = null
 
     private fun onSearch(query: String) {
         val trimmedQuery = query.trim()
         currentSearchQuery = trimmedQuery
+        searchJob?.cancel()
         if (trimmedQuery.isEmpty()) {
             searchGeneration += 1
             isSearchActive = false
@@ -625,46 +625,49 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         val categories = allCategories
         val keywords = localizedKeywords
 
-        // Cancel previous search task
-        searchFuture?.cancel(true)
         val exclude = excludeEmojis
-        searchFuture = searchExecutor.submit {
-            val normalizedQueryVariants = normalizedSearchVariants(trimmedQuery)
-            val scored = mutableListOf<Pair<EmojiGridAdapter.ListItem.Emoji, Int>>()
+        searchJob = viewScope.launch {
+            val matchedItems = withContext(Dispatchers.Default) {
+                val normalizedQueryVariants = normalizedSearchVariants(trimmedQuery)
+                val scored = mutableListOf<Pair<EmojiGridAdapter.ListItem.Emoji, Int>>()
 
-            for (cat in categories) {
-                if (Thread.currentThread().isInterrupted || generation != searchGeneration) return@submit
-                for (emoji in cat.data) {
-                    if (emoji.id in exclude) continue
-                    val score = relevanceScore(emoji, normalizedQueryVariants, keywords)
-                    if (score > 0) {
-                        val resolved = resolveSkinTone(emoji.emoji, emoji.id, emoji.toneEnabled)
-                        scored.add(Pair(EmojiGridAdapter.ListItem.Emoji(
-                            emoji = resolved, name = emoji.name,
-                            toneEnabled = emoji.toneEnabled, keywords = emoji.keywords, id = emoji.id
-                        ), score))
+                for (cat in categories) {
+                    currentCoroutineContext().ensureActive()
+                    for (emoji in cat.data) {
+                        currentCoroutineContext().ensureActive()
+                        if (emoji.id in exclude) continue
+                        val score = relevanceScore(emoji, normalizedQueryVariants, keywords)
+                        if (score > 0) {
+                            val resolved = resolveSkinTone(emoji.emoji, emoji.id, emoji.toneEnabled)
+                            scored.add(Pair(EmojiGridAdapter.ListItem.Emoji(
+                                emoji = resolved,
+                                name = emoji.name,
+                                toneEnabled = emoji.toneEnabled,
+                                keywords = emoji.keywords,
+                                id = emoji.id
+                            ), score))
+                        }
                     }
                 }
+
+                scored.sortByDescending { it.second }
+                scored.map { it.first }
             }
 
-            // Sort by relevance score descending
-            scored.sortByDescending { it.second }
+            if (generation != searchGeneration) return@launch
 
-            if (Thread.currentThread().isInterrupted || generation != searchGeneration) return@submit
-            post {
-                if (generation != searchGeneration) return@post
-                val results = mutableListOf<EmojiGridAdapter.ListItem>()
-                val sectionPositions = mutableListOf<Int>()
+            val results = mutableListOf<EmojiGridAdapter.ListItem>()
+            val sectionPositions = mutableListOf<Int>()
+            if (matchedItems.isNotEmpty()) {
                 sectionPositions.add(0)
                 results.add(EmojiGridAdapter.ListItem.Header("Search Results", "search"))
-                for ((item, _) in scored) { results.add(item) }
-
-                val hasResults = results.size > 1
-                emptyStateLabel.visibility = if (hasResults) View.GONE else View.VISIBLE
-                recyclerView.visibility = if (hasResults) View.VISIBLE else View.GONE
-                gridAdapter.setItems(results, sectionPositions)
-                recyclerView.scrollToPosition(0)
+                results.addAll(matchedItems)
             }
+
+            emptyStateLabel.visibility = if (matchedItems.isNotEmpty()) View.GONE else View.VISIBLE
+            recyclerView.visibility = if (matchedItems.isNotEmpty()) View.VISIBLE else View.GONE
+            gridAdapter.setItems(results, sectionPositions)
+            recyclerView.scrollToPosition(0)
         }
     }
 
@@ -709,13 +712,6 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         }
         return null
     }
-
-    // --- Localized Search ---
-
-    private fun loadLocalizedKeywords(): Map<String, List<String>> {
-        return loadAllKeywords(context)
-    }
-
     // --- Frequently Used ---
 
     private fun getFreqPrefs(): SharedPreferences =
@@ -858,7 +854,8 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        searchFuture?.cancel(true)
-        searchExecutor.shutdownNow()
+        loadJob?.cancel()
+        searchJob?.cancel()
+        viewScope.cancel()
     }
 }
