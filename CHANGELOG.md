@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.2.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.1.0...v1.2.0) (2026-03-23)
+
+### Features
+
+* **android:** add emoji2 dependency for backward-compatible rendering ([#3](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/3)) ([67b3106](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/67b3106251e613606a4aa8c8b295311ca165c83d))
+
+### Bug Fixes
+
+* **android:** filter emojis by OS-supported Unicode version ([#2](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/2)) ([7c70248](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/7c70248d5db3cafb2f607d3d23ebcf5e0f47ef47))
+* **ios:** filter emojis by OS-supported Unicode version ([#1](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/1)) ([caa3432](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/caa343242a2f56ec89d365155314b4bd550c4184))
+
 ## [1.1.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.0.3...v1.1.0) (2026-03-19)
 
 ### Features

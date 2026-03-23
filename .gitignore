@@ -18,3 +18,4 @@ example/android/
 # Locale files are copied at build time by Podfile/Gradle/config plugin.
 ios/translations/*.json
 android/src/main/assets/translations/*.json
+/docs/
