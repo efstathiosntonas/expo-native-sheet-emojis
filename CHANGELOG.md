@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.8.1](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.8.0...v1.8.1) (2026-03-23)
+
+### Bug Fixes
+
+* **android:** restore clear button taps ([e334723](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/e3347236677508c7502db85fe754ddf6422bed42))
+
+### Documentation
+
+* **readme:** document layoutDirection support ([2fd33f9](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/2fd33f9fc570bbe12da7c13b643a81c8e268e728))
+
 ## [1.8.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.7.0...v1.8.0) (2026-03-23)
 
 ### Features

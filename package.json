@@ -1,6 +1,6 @@
 {
   "name": "expo-native-sheet-emojis",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "A fully native emoji picker bottom sheet for React Native. Built with Swift and Kotlin for maximum performance. Features search with multilingual keywords, skin tones, frequently used tracking, theming, and configurable layout.",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
