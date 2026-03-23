@@ -393,6 +393,8 @@ class EmojiSheetUIView: UIView,
         }
     }
 
+    // iOS version → max Unicode emoji version. Source: https://emojipedia.org/apple
+    // Cases MUST remain ordered most-specific first (Swift evaluates top-to-bottom).
     private static func maxSupportedEmojiVersion() -> Double {
         let osVersion = ProcessInfo.processInfo.operatingSystemVersion
         switch (osVersion.majorVersion, osVersion.minorVersion) {
