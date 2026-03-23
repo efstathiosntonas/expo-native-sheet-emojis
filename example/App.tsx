@@ -11,13 +11,24 @@ import { EmojiSheetModule, EmojiSheetView, lightTheme, darkTheme } from 'expo-na
 
 export default function App() {
   const systemScheme = useColorScheme();
-  const [isDark, setIsDark] = useState(systemScheme === 'dark');
+  const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>('system');
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
   const [showEmbedded, setShowEmbedded] = useState(false);
 
-  const theme = isDark ? darkTheme : lightTheme;
-  const bg = isDark ? '#1A1A2E' : '#FFFFFF';
-  const textColor = isDark ? '#FFFFFF' : '#000000';
+  const effectiveDark = themeMode === 'system' ? systemScheme === 'dark' : themeMode === 'dark';
+  const theme = themeMode === 'system' ? 'system' : effectiveDark ? darkTheme : lightTheme;
+  const bg = effectiveDark ? '#1A1A2E' : '#FFFFFF';
+  const textColor = effectiveDark ? '#FFFFFF' : '#000000';
+
+  const cycleTheme = () => {
+    setThemeMode((prev) => {
+      if (prev === 'light') return 'dark';
+      if (prev === 'dark') return 'system';
+      return 'light';
+    });
+  };
+
+  const themeModeLabel = themeMode === 'system' ? 'System' : themeMode === 'dark' ? 'Dark' : 'Light';
 
   const handlePresent = async () => {
     const result = await EmojiSheetModule.present({
@@ -71,16 +82,16 @@ export default function App() {
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: isDark ? '#333' : '#DDD' }]}
-        onPress={() => setIsDark(!isDark)}
+        style={[styles.button, { backgroundColor: effectiveDark ? '#333' : '#DDD' }]}
+        onPress={cycleTheme}
       >
         <Text style={[styles.buttonText, { color: textColor }]}>
-          Toggle Theme ({isDark ? 'Dark' : 'Light'})
+          Theme: {themeModeLabel}
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: isDark ? '#333' : '#DDD' }]}
+        style={[styles.button, { backgroundColor: effectiveDark ? '#333' : '#DDD' }]}
         onPress={() => setShowEmbedded(!showEmbedded)}
       >
         <Text style={[styles.buttonText, { color: textColor }]}>
@@ -92,7 +103,7 @@ export default function App() {
         <View style={styles.embeddedContainer}>
           <EmojiSheetView
             style={styles.embeddedView}
-            theme={isDark ? 'dark' : 'light'}
+            theme={themeMode === 'system' ? 'system' : effectiveDark ? 'dark' : 'light'}
             onEmojiSelected={(emoji) => setSelectedEmoji(emoji)}
           />
         </View>
