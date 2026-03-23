@@ -23,6 +23,18 @@ public class EmojiSheetModule: Module {
         }
         .runOnQueue(DispatchQueue.main)
 
+        AsyncFunction("clearRecents") {
+            UserDefaults.standard.removeObject(forKey: "EmojiSheet_FrequentlyUsed")
+        }
+
+        AsyncFunction("clearSkinTonePreferences") {
+            let defaults = UserDefaults.standard
+            let allKeys = defaults.dictionaryRepresentation().keys
+            for key in allKeys where key.hasPrefix("EmojiSkinTone_") {
+                defaults.removeObject(forKey: key)
+            }
+        }
+
         View(EmojiSheetContentView.self) {
             Prop("theme") { (view, theme: String?) in
                 let resolved: String

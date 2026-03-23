@@ -57,6 +57,8 @@ function flattenOptions(options: EmojiSheetPresentOptions): NativeOptions {
 declare class EmojiSheetModuleType extends NativeModule {
   present(options: NativeOptions): Promise<EmojiSheetResult>;
   dismiss(): Promise<void>;
+  clearRecents(): Promise<void>;
+  clearSkinTonePreferences(): Promise<void>;
 }
 
 const NativeEmojiSheet = requireNativeModule<EmojiSheetModuleType>('EmojiSheet');
@@ -69,5 +71,11 @@ export default {
   },
   dismiss(): Promise<void> {
     return NativeEmojiSheet.dismiss();
+  },
+  clearRecents(): Promise<void> {
+    return NativeEmojiSheet.clearRecents();
+  },
+  clearSkinTonePreferences(): Promise<void> {
+    return NativeEmojiSheet.clearSkinTonePreferences();
   },
 };

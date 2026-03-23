@@ -285,6 +285,18 @@ Programmatically dismisses the emoji picker sheet.
 
 **Returns:** `Promise<void>`
 
+### EmojiSheetModule.clearRecents()
+
+Clears all frequently used emoji data.
+
+**Returns:** `Promise<void>`
+
+### EmojiSheetModule.clearSkinTonePreferences()
+
+Clears all saved skin tone preferences.
+
+**Returns:** `Promise<void>`
+
 ### EmojiSheetView
 
 A declarative React component that renders the emoji picker inline.

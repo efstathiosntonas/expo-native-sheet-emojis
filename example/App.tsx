@@ -91,6 +91,20 @@ export default function App() {
       </TouchableOpacity>
 
       <TouchableOpacity
+        style={[styles.button, { backgroundColor: '#D4A03C' }]}
+        onPress={() => EmojiSheetModule.clearRecents()}
+      >
+        <Text style={styles.buttonText}>Clear Recents</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: '#D4A03C' }]}
+        onPress={() => EmojiSheetModule.clearSkinTonePreferences()}
+      >
+        <Text style={styles.buttonText}>Clear Skin Tones</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
         style={[styles.button, { backgroundColor: effectiveDark ? '#333' : '#DDD' }]}
         onPress={() => setShowEmbedded(!showEmbedded)}
       >

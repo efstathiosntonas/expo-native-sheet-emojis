@@ -143,6 +143,10 @@ if (!result.cancelled) {
 
 // Programmatic dismiss
 await EmojiSheetModule.dismiss();
+
+// Clear persisted data
+await EmojiSheetModule.clearRecents();
+await EmojiSheetModule.clearSkinTonePreferences();
 ```
 
 ## Declarative API
