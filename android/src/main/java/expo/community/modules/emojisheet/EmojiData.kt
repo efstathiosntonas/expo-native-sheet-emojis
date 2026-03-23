@@ -69,10 +69,11 @@ object EmojiData {
         return categories
     }
 
-    fun maxSupportedEmojiVersion(): Double {
+    // API level → max Unicode emoji version (conservative estimates)
+    private fun maxSupportedEmojiVersion(): Double {
         return when {
             Build.VERSION.SDK_INT >= 35 -> 16.0
-            Build.VERSION.SDK_INT >= 34 -> 15.1
+            Build.VERSION.SDK_INT >= 34 -> 15.0
             Build.VERSION.SDK_INT >= 33 -> 15.0
             Build.VERSION.SDK_INT >= 32 -> 14.0
             Build.VERSION.SDK_INT >= 31 -> 14.0
