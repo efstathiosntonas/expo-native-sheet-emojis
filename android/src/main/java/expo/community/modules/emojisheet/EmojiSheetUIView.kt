@@ -156,6 +156,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         recyclerView = RecyclerView(context).apply {
             layoutManager = gridLayoutManager
             adapter = gridAdapter
+            addItemDecoration(StickyHeaderDecoration(gridAdapter))
             setHasFixedSize(false)
             overScrollMode = View.OVER_SCROLL_NEVER
             isNestedScrollingEnabled = true
