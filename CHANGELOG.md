@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.8.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.7.0...v1.8.0) (2026-03-23)
+
+### Features
+
+* add layoutDirection prop for RTL support ([#16](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/16)) ([7755b0b](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/7755b0b47345265cbb3ffefa89fdc6c2816eb90d))
+
 ## [1.7.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.6.0...v1.7.0) (2026-03-23)
 
 ### Features
