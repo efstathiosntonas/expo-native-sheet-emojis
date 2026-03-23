@@ -76,6 +76,9 @@ class EmojiSheetModule : Module() {
                 Prop("categoryBarPosition") { view: EmojiSheetContentView, position: String? ->
                     view.updateCategoryBarPosition(position ?: "top")
                 }
+                Prop("layoutDirection") { view: EmojiSheetContentView, direction: String? ->
+                    view.updateLayoutDirection(direction ?: "auto")
+                }
                 Prop("columns") { view: EmojiSheetContentView, columns: Int? ->
                     view.updateColumns(columns ?: 7)
                 }
@@ -143,6 +146,7 @@ class EmojiSheetModule : Module() {
         val gestureEnabled = options["gestureEnabled"] as? Boolean ?: true
         val backdropOpacity = (options["backdropOpacity"] as? Number)?.toFloat() ?: if (isDark) 0.4f else 0.22f
         val categoryBarPosition = options["categoryBarPosition"] as? String ?: "top"
+        val layoutDirection = options["layoutDirection"] as? String ?: "auto"
         @Suppress("UNCHECKED_CAST")
         val categoryNames = options["categoryNames"] as? Map<String, String>
         @Suppress("UNCHECKED_CAST")
@@ -202,6 +206,7 @@ class EmojiSheetModule : Module() {
         pickerView.enableAnimations = enableAnimations
         pickerView.recentLimit = recentLimit
         pickerView.categoryBarPosition = categoryBarPosition
+        pickerView.layoutDirectionProp = layoutDirection
         pickerView.categoryNames = categoryNames
         pickerView.excludeEmojis = excludeEmojis
         (options["searchPlaceholder"] as? String)?.let { pickerView.searchPlaceholder = it }

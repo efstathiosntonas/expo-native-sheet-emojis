@@ -81,6 +81,13 @@ class EmojiCategoryStrip(
         adapter.notifyDataSetChanged()
     }
 
+    fun applyLayoutDirection(direction: Int) {
+        layoutDirection = direction
+        recyclerView.layoutDirection = direction
+        dividerView.layoutDirection = direction
+        recyclerView.adapter?.notifyDataSetChanged()
+    }
+
     private inner class CategoryAdapter : RecyclerView.Adapter<CategoryAdapter.VH>() {
 
         inner class VH(val container: FrameLayout) : RecyclerView.ViewHolder(container) {

@@ -41,6 +41,7 @@ class EmojiSearchBar: UIView, UITextFieldDelegate {
         textField.placeholder = "Search emoji"
         textField.borderStyle = .none
         textField.font = .systemFont(ofSize: 16)
+        textField.textAlignment = .natural
         textField.returnKeyType = .search
         textField.autocorrectionType = .no
         textField.autocapitalizationType = .none

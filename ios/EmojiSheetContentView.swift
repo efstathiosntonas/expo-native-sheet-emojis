@@ -50,6 +50,10 @@ class EmojiSheetContentView: ExpoView, EmojiSheetUIViewDelegate {
         pickerView.categoryBarPosition = position
     }
 
+    func updateLayoutDirection(_ direction: String) {
+        pickerView.layoutDirection = direction
+    }
+
     func updateColumns(_ columns: Int) {
         pickerView.columns = columns
     }

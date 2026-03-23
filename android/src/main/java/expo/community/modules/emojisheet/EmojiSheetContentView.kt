@@ -38,6 +38,10 @@ class EmojiSheetContentView(
         pickerView.applyConfiguration()
     }
 
+    fun updateLayoutDirection(direction: String) {
+        pickerView.layoutDirectionProp = direction
+    }
+
     fun updateColumns(columns: Int) {
         pickerView.columns = columns
         pickerView.applyConfiguration()

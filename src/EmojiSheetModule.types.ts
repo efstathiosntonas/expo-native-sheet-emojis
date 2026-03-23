@@ -38,6 +38,7 @@ export type EmojiSheetTranslations = {
 export type EmojiSheetPresentOptions = {
   theme?: EmojiSheetTheme | 'dark' | 'light' | 'system';
   translations?: EmojiSheetTranslations;
+  layoutDirection?: 'ltr' | 'rtl' | 'auto';
   snapPoints?: [number, number];
   categoryBarPosition?: 'top' | 'bottom';
   columns?: number;
@@ -64,6 +65,7 @@ export type EmojiSheetViewProps = ViewProps & {
   onDismiss?: () => void;
   theme?: EmojiSheetTheme | 'dark' | 'light' | 'system';
   translations?: EmojiSheetTranslations;
+  layoutDirection?: 'ltr' | 'rtl' | 'auto';
   categoryBarPosition?: 'top' | 'bottom';
   columns?: number;
   emojiSize?: number;
@@ -80,6 +82,7 @@ export type EmojiSheetNativeViewProps = ViewProps & {
   onEmojiSelected: EmojiSelectionListener;
   onDismiss?: (event: { nativeEvent: {} }) => void;
   theme?: string;
+  layoutDirection?: 'ltr' | 'rtl' | 'auto';
   categoryBarPosition?: string;
   columns?: number;
   emojiSize?: number;

@@ -83,6 +83,11 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
     var enableAnimations: Boolean = false
     var recentLimit: Int = 30
     var categoryBarPosition: String = "top"
+    var layoutDirectionProp: String = "auto"
+        set(value) {
+            field = value
+            applyLayoutDirection()
+        }
     var categoryNames: Map<String, String>? = null
     @Volatile
     var excludeEmojis: Set<String> = emptySet()
@@ -277,6 +282,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         addView(contentFrame)
 
         applyTheme(currentTheme)
+        applyLayoutDirection()
     }
 
     /** Call after setting configurable properties but before loadDataAsync to apply layout changes. */
@@ -418,6 +424,21 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         emptyStateLabel.setTextColor(theme.textSecondaryColor)
     }
 
+    private fun applyLayoutDirection() {
+        val dir = when (layoutDirectionProp) {
+            "rtl" -> View.LAYOUT_DIRECTION_RTL
+            "ltr" -> View.LAYOUT_DIRECTION_LTR
+            else -> View.LAYOUT_DIRECTION_LOCALE
+        }
+
+        layoutDirection = dir
+        searchBar.layoutDirection = dir
+        categoryStrip.applyLayoutDirection(dir)
+        recyclerView.layoutDirection = dir
+        contentFrame.layoutDirection = dir
+        requestLayout()
+    }
+
     private fun buildCategoryKeys(): List<String> {
         val keys = mutableListOf<String>()
         if (showRecents && getFrequentlyUsed().isNotEmpty()) {
@@ -504,6 +525,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
             addView(categoryStrip, index)
         }
         categoryStrip.applyTheme(currentTheme)
+        applyLayoutDirection()
     }
 
     private fun resolveSkinTone(baseEmoji: String, emojiId: String, toneEnabled: Boolean): String {

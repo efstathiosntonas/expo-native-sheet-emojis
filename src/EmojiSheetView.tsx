@@ -13,6 +13,7 @@ export default function EmojiSheetView({
   onDismiss,
   theme,
   translations,
+  layoutDirection,
   categoryBarPosition,
   columns,
   emojiSize,
@@ -35,6 +36,7 @@ export default function EmojiSheetView({
     <NativeView
       {...rest}
       theme={resolvedTheme}
+      layoutDirection={layoutDirection}
       categoryBarPosition={categoryBarPosition}
       columns={columns}
       emojiSize={emojiSize}
