@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.9.0...v2.0.0) (2026-03-23)
+
+### Features
+
+* name/id in result, onOpen callback, accessibility hints, iOS translation bundling fix ([#19](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/19)) ([cf2831c](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/cf2831c254d5181b11694b9fad04cac9147c0028))
+
+## [1.10.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.9.0...v1.10.0) (2026-03-23)
+
+### Features
+
+* name/id in result, onOpen callback, accessibility hints, iOS translation bundling fix ([#19](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/19)) ([cf2831c](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/cf2831c254d5181b11694b9fad04cac9147c0028))
+
 ## [1.9.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.8.1...v1.9.0) (2026-03-23)
 
 ### Features
