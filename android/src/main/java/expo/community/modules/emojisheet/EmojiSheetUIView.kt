@@ -114,6 +114,8 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
     private var initialTouchY = 0f
     private var lastTopPullDragDistance = 0f
     private var isHandlingTopPullDrag = false
+    private var isSheetExpanded = false
+    private var isSheetExpansionInProgress = false
     private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop.toFloat()
     private var velocityTracker: VelocityTracker? = null
     private var topPullStartY: Float? = null
@@ -181,6 +183,10 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
                             lastTopPullDragDistance = 0f
                             isHandlingTopPullDrag = false
                             topPullStartY = null
+                            if (isSheetExpansionInProgress) {
+                                rv.stopScroll()
+                                return true
+                            }
                         }
                         android.view.MotionEvent.ACTION_UP,
                         android.view.MotionEvent.ACTION_CANCEL -> {
@@ -195,12 +201,28 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
                             topPullStartY = null
                             velocityTracker?.recycle()
                             velocityTracker = null
+                            if (isSheetExpansionInProgress) {
+                                rv.stopScroll()
+                                return true
+                            }
                         }
                     }
 
                     if (e.actionMasked == android.view.MotionEvent.ACTION_MOVE) {
+                        if (isSheetExpansionInProgress) {
+                            rv.stopScroll()
+                            return true
+                        }
+
                         val deltaY = e.y - initialTouchY
                         val isAtTop = !rv.canScrollVertically(-1)
+                        if (!isSheetExpanded && deltaY < -touchSlop && !didTriggerExpandForCurrentDrag) {
+                            didTriggerExpandForCurrentDrag = true
+                            isSheetExpansionInProgress = true
+                            rv.stopScroll()
+                            onScrollIntentUp?.invoke()
+                            return true
+                        }
                         if (isHandlingTopPullDrag) {
                             rv.parent?.requestDisallowInterceptTouchEvent(true)
                             rv.stopScroll()
@@ -240,6 +262,11 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
             }
 
             override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+                if (!isSheetExpanded) {
+                    rv.stopScroll()
+                    return
+                }
+
                 if (dy > 0 && rv.scrollState != RecyclerView.SCROLL_STATE_IDLE && !didTriggerExpandForCurrentDrag) {
                     didTriggerExpandForCurrentDrag = true
                     onScrollIntentUp?.invoke()
@@ -283,6 +310,20 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
 
         applyTheme(currentTheme)
         applyLayoutDirection()
+    }
+
+    fun setSheetExpanded(expanded: Boolean) {
+        isSheetExpanded = expanded
+        if (expanded) {
+            isSheetExpansionInProgress = false
+        }
+    }
+
+    fun setSheetExpansionInProgress(inProgress: Boolean) {
+        isSheetExpansionInProgress = inProgress
+        if (inProgress) {
+            recyclerView.stopScroll()
+        }
     }
 
     /** Call after setting configurable properties but before loadDataAsync to apply layout changes. */

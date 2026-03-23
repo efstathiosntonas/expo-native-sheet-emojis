@@ -28,6 +28,7 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
     private var sections: [EmojiSection] = []
     private var categoryNames: [String: String] = [:]
     private var currentTheme: EmojiSheetTheme = .light
+    private var headerTextAlignment: NSTextAlignment = .left
     private var collectionView: UICollectionView!
     private var skinTonePicker: EmojiSkinTonePicker?
     private var isScrollingProgrammatically = false
@@ -131,6 +132,9 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
     func applyLayoutDirection(_ attribute: UISemanticContentAttribute) {
         semanticContentAttribute = attribute
         collectionView.semanticContentAttribute = attribute
+        headerTextAlignment = UIView.userInterfaceLayoutDirection(for: attribute) == .rightToLeft
+            ? .right
+            : .left
         collectionView.collectionViewLayout.invalidateLayout()
         collectionView.reloadData()
     }
@@ -234,7 +238,7 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
         ) as! SectionHeaderView
         let title = sections[indexPath.section].title
         let displayName = categoryNames[title] ?? title.replacingOccurrences(of: "_", with: " ").capitalized
-        header.configure(title: displayName, theme: currentTheme)
+        header.configure(title: displayName, theme: currentTheme, textAlignment: headerTextAlignment)
         header.isAccessibilityElement = true
         header.accessibilityLabel = displayName
         return header
@@ -511,8 +515,9 @@ private class SectionHeaderView: UICollectionReusableView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(title: String, theme: EmojiSheetTheme) {
+    func configure(title: String, theme: EmojiSheetTheme, textAlignment: NSTextAlignment) {
         titleLabel.text = title
+        titleLabel.textAlignment = textAlignment
         titleLabel.textColor = theme.textSecondaryColor
         backgroundColor = theme.backgroundColor
     }

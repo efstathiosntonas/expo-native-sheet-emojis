@@ -100,9 +100,12 @@ class EmojiSearchBar: UIView, UITextFieldDelegate {
     func applyLayoutDirection(_ attribute: UISemanticContentAttribute) {
         semanticContentAttribute = attribute
         containerView.semanticContentAttribute = attribute
+        iconView.semanticContentAttribute = attribute
         textField.semanticContentAttribute = attribute
         clearButton.semanticContentAttribute = attribute
-        textField.textAlignment = .natural
+        textField.textAlignment = UIView.userInterfaceLayoutDirection(for: attribute) == .rightToLeft
+            ? .right
+            : .left
     }
 
     @objc private func textFieldDidChange() {

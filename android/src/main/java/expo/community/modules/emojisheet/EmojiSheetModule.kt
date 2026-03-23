@@ -226,6 +226,7 @@ class EmojiSheetModule : Module() {
         }
         pickerView.onSearchFocused = { hasFocus ->
             if (hasFocus) {
+                pickerView.setSheetExpansionInProgress(true)
                 bottomSheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
             } else {
                 bottomSheet.behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
@@ -233,6 +234,7 @@ class EmojiSheetModule : Module() {
         }
         pickerView.onScrollIntentUp = {
             if (bottomSheet.behavior.state != BottomSheetBehavior.STATE_EXPANDED) {
+                pickerView.setSheetExpansionInProgress(true)
                 bottomSheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
@@ -321,6 +323,17 @@ class EmojiSheetModule : Module() {
             skipCollapsed = false
             isFitToContents = false
             isDraggable = gestureEnabled
+            addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    pickerView.setSheetExpanded(newState == BottomSheetBehavior.STATE_EXPANDED)
+                    pickerView.setSheetExpansionInProgress(
+                        newState == BottomSheetBehavior.STATE_DRAGGING ||
+                            newState == BottomSheetBehavior.STATE_SETTLING
+                    )
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) = Unit
+            })
         }
 
         bottomSheet.setOnDismissListener {
