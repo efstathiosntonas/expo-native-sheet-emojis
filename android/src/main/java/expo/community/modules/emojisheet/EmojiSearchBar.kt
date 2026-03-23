@@ -53,7 +53,7 @@ class EmojiSearchBar(
         layoutParams = lp
 
         searchIcon = ImageView(context).apply {
-            setImageResource(android.R.drawable.ic_menu_search)
+            setImageResource(R.drawable.ic_search)
             scaleType = ImageView.ScaleType.CENTER_INSIDE
             val iconLp = LayoutParams(iconWidth, LayoutParams.MATCH_PARENT)
             layoutParams = iconLp
