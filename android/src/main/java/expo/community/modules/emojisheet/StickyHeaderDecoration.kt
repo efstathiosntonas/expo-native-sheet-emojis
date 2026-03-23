@@ -28,8 +28,9 @@ class StickyHeaderDecoration(
         if (nextHeaderPosition != RecyclerView.NO_POSITION) {
             val nextHeaderView = parent.findViewHolderForAdapterPosition(nextHeaderPosition)?.itemView
             if (nextHeaderView != null && nextHeaderView.top < headerView.height) {
+                val offset = maxOf(0f, (nextHeaderView.top - headerView.height).toFloat())
                 c.save()
-                c.translate(0f, (nextHeaderView.top - headerView.height).toFloat())
+                c.translate(0f, offset)
                 headerView.draw(c)
                 c.restore()
                 return
