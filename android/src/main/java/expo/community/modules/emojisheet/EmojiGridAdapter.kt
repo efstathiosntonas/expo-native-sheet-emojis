@@ -9,6 +9,9 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.AccessibilityDelegateCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.recyclerview.widget.RecyclerView
 
 class EmojiGridAdapter(
@@ -140,9 +143,16 @@ class EmojiGridAdapter(
                         onEmojiLongPress(h.container, item.emoji, item.id)
                         true
                     }
+                    ViewCompat.setAccessibilityDelegate(h.container, object : AccessibilityDelegateCompat() {
+                        override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
+                            super.onInitializeAccessibilityNodeInfo(host, info)
+                            info.hintText = "Hold to select skin tone"
+                        }
+                    })
                 } else {
                     h.container.setOnLongClickListener(null)
                     h.container.isLongClickable = false
+                    ViewCompat.setAccessibilityDelegate(h.container, null)
                 }
             }
         }

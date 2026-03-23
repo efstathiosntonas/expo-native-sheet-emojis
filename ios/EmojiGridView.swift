@@ -213,6 +213,7 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
         cell.isAccessibilityElement = true
         cell.accessibilityLabel = item.name
         cell.accessibilityTraits = .button
+        cell.accessibilityHint = (enableSkinTones && item.toneEnabled) ? "Hold to select skin tone" : nil
 
         // Add long press for tone-enabled emojis
         if enableSkinTones && item.toneEnabled {

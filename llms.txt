@@ -93,17 +93,19 @@ type EmojiSheetPresentOptions = {
   enableSkinTones?: boolean;                   // default: true
   enableHaptics?: boolean;                     // default: true -- haptic feedback on tap, long-press, skin tone select
   enableAnimations?: boolean;                  // default: false -- scale animation on emoji tap (useful for embedded EmojiSheetView)
+  onOpen?: () => void;                         // called when the sheet becomes visible
   gestureEnabled?: boolean;                    // default: true (swipe-to-dismiss)
   backdropOpacity?: number;                    // default: 0.22
   excludeEmojis?: string[];                    // default: [] -- emoji IDs to hide
 };
 
 type EmojiSheetResult =
-  | { emoji: string; cancelled?: never }       // user selected an emoji
-  | { cancelled: true; emoji?: never };        // user dismissed without selecting
+  | { emoji: string; name: string; id: string; cancelled?: never }  // user selected an emoji
+  | { cancelled: true; emoji?: never; name?: never; id?: never };   // user dismissed without selecting
 
 type EmojiSheetViewProps = ViewProps & {
-  onEmojiSelected: (emoji: string) => void;    // required callback
+  onEmojiSelected: (emoji: string, name: string, id: string) => void;  // required callback
+  onOpen?: () => void;                           // called when picker becomes visible
   onDismiss?: () => void;                        // called when picker is dismissed (View API only, not Embedded view)
   theme?: EmojiSheetTheme | 'dark' | 'light' | 'system';
   translations?: EmojiSheetTranslations;

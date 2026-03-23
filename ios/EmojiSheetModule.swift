@@ -9,6 +9,8 @@ public class EmojiSheetModule: Module {
     public func definition() -> ModuleDefinition {
         Name("EmojiSheet")
 
+        Events("onSheetOpened")
+
         OnCreate {
             EmojiSheetUIView.warmCache()
         }
@@ -87,7 +89,7 @@ public class EmojiSheetModule: Module {
             Prop("excludeEmojis") { (view, ids: [String]?) in
                 view.updateExcludeEmojis(ids ?? [])
             }
-            Events("onEmojiSelected", "onDismiss")
+            Events("onEmojiSelected", "onDismiss", "onOpen")
         }
     }
 
@@ -209,6 +211,9 @@ public class EmojiSheetModule: Module {
         sheetVC.mediumDetentRatio = CGFloat(snapPoints.first ?? 0.5)
         sheetVC.gestureEnabled = gestureEnabled
         sheetVC.embedPickerView(pickerView)
+        sheetVC.onAppear = { [weak self] in
+            self?.sendEvent("onSheetOpened", [:])
+        }
         sheetVC.onDismiss = { [weak self] in
             if let promise = self?.currentPromise {
                 promise.resolve(["cancelled": true])
@@ -312,6 +317,7 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
         case large
     }
 
+    var onAppear: (() -> Void)?
     var onDismiss: (() -> Void)?
     var mediumDetentRatio: CGFloat = 0.5
     var gestureEnabled: Bool = true
@@ -373,6 +379,8 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
         ) {
             self.backdropView.alpha = Layout.backdropAlpha
             self.sheetContainerView.transform = self.transform(for: self.currentDetent)
+        } completion: { [weak self] _ in
+            self?.onAppear?()
         }
     }
 

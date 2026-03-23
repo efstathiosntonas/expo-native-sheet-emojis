@@ -29,6 +29,8 @@ class EmojiSheetModule : Module() {
         ModuleDefinition {
             Name("EmojiSheet")
 
+            Events("onSheetOpened")
+
             OnCreate {
                 val ctx = appContext.reactContext ?: return@OnCreate
                 EmojiSheetUIView.warmCache(ctx)
@@ -115,7 +117,7 @@ class EmojiSheetModule : Module() {
                 Prop("excludeEmojis") { view: EmojiSheetContentView, ids: List<String>? ->
                     view.updateExcludeEmojis(ids ?: emptyList())
                 }
-                Events("onEmojiSelected", "onDismiss")
+                Events("onEmojiSelected", "onDismiss", "onOpen")
             }
         }
 
@@ -308,6 +310,7 @@ class EmojiSheetModule : Module() {
                 (parent as? View)?.setBackgroundColor(Color.TRANSPARENT)
             }
             pickerView.loadDataAsync()
+            sendEvent("onSheetOpened", android.os.Bundle())
         }
 
         bottomSheet.window?.let { window ->

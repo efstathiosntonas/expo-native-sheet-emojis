@@ -72,7 +72,7 @@ function MyComponent() {
       style={{ flex: 1 }}
       theme="light"
       layoutDirection="auto"
-      onEmojiSelected={(emoji) => console.log(emoji)}
+      onEmojiSelected={(emoji, name, id) => console.log(emoji, name, id)}
       columns={7}
       showSearch={true}
     />
@@ -278,7 +278,7 @@ Presents the emoji picker as a native bottom sheet. Returns a promise that resol
 **Returns:** `Promise<EmojiSheetResult>`
 
 The result is a discriminated union:
-- `{ emoji: string }` when an emoji is selected
+- `{ emoji: string; name: string; id: string }` when an emoji is selected
 - `{ cancelled: true }` when the sheet is dismissed without selection
 
 ### EmojiSheetModule.dismiss()
@@ -307,8 +307,9 @@ A declarative React component that renders the emoji picker inline.
 
 | Prop | Type | Default | Description |
 |-|-|-|-|
-| onEmojiSelected | `(emoji: string) => void` | required | Called when an emoji is tapped |
+| onEmojiSelected | `(emoji: string, name: string, id: string) => void` | required | Called when an emoji is tapped |
 | onDismiss | `() => void` | -- | Called when the picker is dismissed (View API only, not Embedded view) |
+| onOpen | `() => void` | -- | Called when the picker becomes visible |
 | theme | `EmojiSheetTheme \| 'dark' \| 'light' \| 'system'` | `'light'` | Theme configuration |
 | translations | `EmojiSheetTranslations` | -- | Localized strings |
 | layoutDirection | `'auto' \| 'ltr' \| 'rtl'` | `'auto'` | UI layout direction. `'auto'` follows the device locale; use `'ltr'` or `'rtl'` to force a direction. |
@@ -372,6 +373,7 @@ All theme fields with their purpose:
 | gestureEnabled | `boolean` | `true` | Allow swipe-to-dismiss gesture |
 | backdropOpacity | `number` | `0.22` | Opacity of the backdrop behind the sheet |
 | excludeEmojis | `string[]` | `[]` | Emoji IDs to hide from the picker |
+| onOpen | `() => void` | -- | Called when the sheet becomes visible |
 
 ### EmojiSheetResult
 
@@ -379,8 +381,8 @@ A discriminated union type:
 
 ```typescript
 type EmojiSheetResult =
-  | { emoji: string; cancelled?: never }
-  | { cancelled: true; emoji?: never };
+  | { emoji: string; name: string; id: string; cancelled?: never }
+  | { cancelled: true; emoji?: never; name?: never; id?: never };
 ```
 
 ## Category Bar Position
@@ -431,7 +433,7 @@ await EmojiSheetModule.present({
 
 ## LLM / AI Agent Reference
 
-If you're an AI agent or using an LLM to integrate this module, see [llms.txt](llms.txt) for a concise, structured reference with all types, APIs, and usage patterns.
+If you're an AI agent or using an LLM to integrate this module, see [llms.txt](https://raw.githubusercontent.com/efstathiosntonas/expo-native-sheet-emojis/refs/heads/main/llms.txt) for a concise, structured reference with all types, APIs, and usage patterns.
 
 ## Contributing
 

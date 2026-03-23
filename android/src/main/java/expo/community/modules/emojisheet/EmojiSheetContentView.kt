@@ -14,6 +14,7 @@ class EmojiSheetContentView(
 
     private val onEmojiSelected by EventDispatcher()
     private val onDismiss by EventDispatcher()
+    private val onOpen by EventDispatcher()
     private val pickerView = EmojiSheetUIView(context)
 
     init {
@@ -23,6 +24,11 @@ class EmojiSheetContentView(
         }
         addView(pickerView)
         pickerView.loadDataAsync()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        onOpen(mapOf<String, Any>())
     }
 
     fun applyConfiguration() {

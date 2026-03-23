@@ -52,17 +52,19 @@ export type EmojiSheetPresentOptions = {
   gestureEnabled?: boolean;
   backdropOpacity?: number;
   excludeEmojis?: string[];
+  onOpen?: () => void;
 };
 
 export type EmojiSheetResult =
-  | { emoji: string; cancelled?: never }
-  | { cancelled: true; emoji?: never };
+  | { emoji: string; name: string; id: string; cancelled?: never }
+  | { cancelled: true; emoji?: never; name?: never; id?: never };
 
-export type EmojiSelectionListener = (event: { nativeEvent: { emoji: string } }) => void;
+export type EmojiSelectionListener = (event: { nativeEvent: { emoji: string; name: string; id: string } }) => void;
 
 export type EmojiSheetViewProps = ViewProps & {
-  onEmojiSelected: (emoji: string) => void;
+  onEmojiSelected: (emoji: string, name: string, id: string) => void;
   onDismiss?: () => void;
+  onOpen?: () => void;
   theme?: EmojiSheetTheme | 'dark' | 'light' | 'system';
   translations?: EmojiSheetTranslations;
   layoutDirection?: 'ltr' | 'rtl' | 'auto';
@@ -81,6 +83,7 @@ export type EmojiSheetViewProps = ViewProps & {
 export type EmojiSheetNativeViewProps = ViewProps & {
   onEmojiSelected: EmojiSelectionListener;
   onDismiss?: (event: { nativeEvent: {} }) => void;
+  onOpen?: (event: { nativeEvent: {} }) => void;
   theme?: string;
   layoutDirection?: 'ltr' | 'rtl' | 'auto';
   categoryBarPosition?: string;

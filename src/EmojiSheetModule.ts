@@ -56,7 +56,7 @@ function flattenOptions(options: EmojiSheetPresentOptions): NativeOptions {
   return flat;
 }
 
-declare class EmojiSheetModuleType extends NativeModule {
+declare class EmojiSheetModuleType extends NativeModule<{ onSheetOpened: () => void }> {
   present(options: NativeOptions): Promise<EmojiSheetResult>;
   dismiss(): Promise<void>;
   clearRecents(): Promise<void>;
@@ -69,7 +69,20 @@ export type { EmojiSheetResult };
 
 export default {
   present(options: EmojiSheetPresentOptions = {}): Promise<EmojiSheetResult> {
-    return NativeEmojiSheet.present(flattenOptions(options));
+    let subscription: ReturnType<typeof NativeEmojiSheet.addListener> | null = null;
+
+    if (options.onOpen) {
+      subscription = NativeEmojiSheet.addListener('onSheetOpened', () => {
+        options.onOpen!();
+        subscription?.remove();
+        subscription = null;
+      });
+    }
+
+    return NativeEmojiSheet.present(flattenOptions(options)).finally(() => {
+      subscription?.remove();
+      subscription = null;
+    });
   },
   dismiss(): Promise<void> {
     return NativeEmojiSheet.dismiss();
