@@ -238,6 +238,15 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
         if enableHaptics {
             selectionFeedback.selectionChanged()
         }
+        if let cell = collectionView.cellForItem(at: indexPath) {
+            UIView.animate(withDuration: 0.08, delay: 0, options: [.allowUserInteraction]) {
+                cell.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
+            } completion: { _ in
+                UIView.animate(withDuration: 0.08) {
+                    cell.transform = .identity
+                }
+            }
+        }
         let item = sections[indexPath.section].data[indexPath.item]
         var emoji = item.emoji
         if item.toneEnabled, let savedTone = UserDefaults.standard.string(forKey: "EmojiSkinTone_\(item.id)") {

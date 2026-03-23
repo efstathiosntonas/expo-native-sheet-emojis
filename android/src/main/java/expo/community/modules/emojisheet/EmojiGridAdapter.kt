@@ -119,6 +119,9 @@ class EmojiGridAdapter(
                     if (enableHaptics) {
                         view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
                     }
+                    view.animate().scaleX(0.85f).scaleY(0.85f).setDuration(80).withEndAction {
+                        view.animate().scaleX(1f).scaleY(1f).setDuration(80).start()
+                    }.start()
                     onEmojiClick(item.emoji, item.id)
                 }
                 if (item.toneEnabled && enableSkinTones) {
