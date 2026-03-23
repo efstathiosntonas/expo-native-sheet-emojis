@@ -405,7 +405,7 @@ class EmojiSheetUIView: UIView,
         }
     }
 
-    private static func loadAllKeywords() -> [String: [String]] {
+    nonisolated private static func loadAllKeywords() -> [String: [String]] {
         let bundle = Bundle(for: EmojiSheetUIView.self)
         var merged: [String: [String]] = [:]
 
@@ -438,7 +438,7 @@ class EmojiSheetUIView: UIView,
         return merged
     }
 
-    private static func mergeKeywords(from url: URL, into merged: inout [String: [String]]) {
+    nonisolated private static func mergeKeywords(from url: URL, into merged: inout [String: [String]]) {
         guard let data = try? Data(contentsOf: url),
               let dict = try? JSONSerialization.jsonObject(with: data) as? [String: [String]]
         else { return }
@@ -474,7 +474,7 @@ class EmojiSheetUIView: UIView,
 
     // iOS version → max Unicode emoji version. Source: https://emojipedia.org/apple
     // Cases MUST remain ordered most-specific first (Swift evaluates top-to-bottom).
-    private static func maxSupportedEmojiVersion() -> Double {
+    nonisolated private static func maxSupportedEmojiVersion() -> Double {
         let osVersion = ProcessInfo.processInfo.operatingSystemVersion
         switch (osVersion.majorVersion, osVersion.minorVersion) {
         case (18, 4...): return 16.0
@@ -489,7 +489,7 @@ class EmojiSheetUIView: UIView,
         }
     }
 
-    private static func parseEmojiJSON() -> [EmojiSection] {
+    nonisolated private static func parseEmojiJSON() -> [EmojiSection] {
         let bundle = Bundle(for: EmojiSheetUIView.self)
         guard let url = bundle.url(forResource: "emojis", withExtension: "json"),
               let data = try? Data(contentsOf: url),
@@ -611,7 +611,7 @@ class EmojiSheetUIView: UIView,
         }
     }
 
-    private static func localizedKeywordsForEmoji(_ emoji: String, in dict: [String: [String]]) -> [String] {
+    nonisolated private static func localizedKeywordsForEmoji(_ emoji: String, in dict: [String: [String]]) -> [String] {
         if let kw = dict[emoji] { return kw }
         let stripped = String(emoji.unicodeScalars.filter { $0.value != 0xFE0E && $0.value != 0xFE0F })
         if stripped != emoji, let kw = dict[stripped] { return kw }
@@ -622,7 +622,7 @@ class EmojiSheetUIView: UIView,
     // 100 = exact name match, 90 = name starts with, 80 = exact keyword,
     // 70 = keyword starts with, 50 = name contains, 30 = keyword contains,
     // 10 = localized keyword contains. Returns 0 for no match.
-    private static func relevanceScore(
+    nonisolated private static func relevanceScore(
         item: EmojiItem,
         searchVariants: [String],
         localizedKeywords: [String: [String]]
@@ -725,7 +725,7 @@ class EmojiSheetUIView: UIView,
         UserDefaults.standard.set(dict, forKey: Self.frequentlyUsedKey)
     }
 
-    private static func normalizeSearchText(_ text: String) -> String {
+    nonisolated private static func normalizeSearchText(_ text: String) -> String {
         text
             .precomposedStringWithCompatibilityMapping
             .folding(
@@ -736,7 +736,7 @@ class EmojiSheetUIView: UIView,
             .lowercased(with: .current)
     }
 
-    private static func normalizedSearchVariants(_ text: String) -> [String] {
+    nonisolated private static func normalizedSearchVariants(_ text: String) -> [String] {
         let normalized = normalizeSearchText(text)
         let transliterated = text.applyingTransform(.toLatin, reverse: false)
             .map(normalizeSearchText)
