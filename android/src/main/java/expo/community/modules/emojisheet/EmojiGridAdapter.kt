@@ -113,6 +113,10 @@ class EmojiGridAdapter(
             }
             is ListItem.Emoji -> {
                 val h = holder as EmojiVH
+                // Cancel any in-flight animation from a previous binding to prevent stale end-actions on recycled views
+                h.container.animate().cancel()
+                h.container.scaleX = 1f
+                h.container.scaleY = 1f
                 h.textView.text = item.emoji
                 h.container.contentDescription = item.name
                 h.textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, emojiTextSize)
@@ -124,6 +128,7 @@ class EmojiGridAdapter(
                         view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
                     }
                     if (enableAnimations) {
+                        view.animate().cancel()
                         view.animate().scaleX(0.85f).scaleY(0.85f).setDuration(80).withEndAction {
                             view.animate().scaleX(1f).scaleY(1f).setDuration(80).start()
                         }.start()

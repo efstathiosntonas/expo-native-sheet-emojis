@@ -3,7 +3,7 @@ import UIKit
 
 // MARK: - Data Models
 
-struct EmojiItem {
+struct EmojiItem: Sendable {
     let emoji: String
     let name: String
     let version: String
@@ -12,7 +12,7 @@ struct EmojiItem {
     let id: String
 }
 
-struct EmojiSection {
+struct EmojiSection: Sendable {
     let title: String
     var data: [EmojiItem]
 }

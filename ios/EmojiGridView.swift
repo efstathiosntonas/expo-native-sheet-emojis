@@ -251,11 +251,12 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
             selectionFeedback.selectionChanged()
         }
         if enableAnimations, let cell = collectionView.cellForItem(at: indexPath) {
+            let path = indexPath
             UIView.animate(withDuration: 0.08, delay: 0, options: [.allowUserInteraction]) {
                 cell.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
-            } completion: { _ in
+            } completion: { [weak collectionView] _ in
                 UIView.animate(withDuration: 0.08) {
-                    cell.transform = .identity
+                    collectionView?.cellForItem(at: path)?.transform = .identity
                 }
             }
         }
