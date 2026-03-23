@@ -393,6 +393,23 @@ class EmojiSheetUIView: UIView,
         }
     }
 
+    // iOS version → max Unicode emoji version. Source: https://emojipedia.org/apple
+    // Cases MUST remain ordered most-specific first (Swift evaluates top-to-bottom).
+    private static func maxSupportedEmojiVersion() -> Double {
+        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+        switch (osVersion.majorVersion, osVersion.minorVersion) {
+        case (18, 4...): return 16.0
+        case (18, _):    return 15.1
+        case (17, 4...): return 15.1
+        case (17, _):    return 15.0
+        case (16, 4...): return 15.0
+        case (16, _):    return 14.0
+        case (15, 4...): return 14.0
+        case (15, _):    return 13.1
+        default:         return 13.1
+        }
+    }
+
     private static func parseEmojiJSON() -> [EmojiSection] {
         let bundle = Bundle(for: EmojiSheetUIView.self)
         guard let url = bundle.url(forResource: "emojis", withExtension: "json"),
@@ -402,6 +419,7 @@ class EmojiSheetUIView: UIView,
             return []
         }
 
+        let maxVersion = Self.maxSupportedEmojiVersion()
         return json.compactMap { sectionDict -> EmojiSection? in
             guard let title = sectionDict["title"] as? String,
                   let items = sectionDict["data"] as? [[String: Any]]
@@ -418,6 +436,8 @@ class EmojiSheetUIView: UIView,
                 else {
                     return nil
                 }
+                let emojiVersion = Double(v) ?? 0
+                guard emojiVersion <= maxVersion else { return nil }
                 return EmojiItem(emoji: emoji, name: name, version: v, toneEnabled: toneEnabled, keywords: keywords, id: id)
             }
             return EmojiSection(title: title, data: emojis)
