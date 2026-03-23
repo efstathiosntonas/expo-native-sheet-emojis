@@ -80,6 +80,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
     var showRecents: Boolean = true
     var enableSkinTones: Boolean = true
     var enableHaptics: Boolean = true
+    var enableAnimations: Boolean = false
     var recentLimit: Int = 30
     var categoryBarPosition: String = "top"
     var categoryNames: Map<String, String>? = null
@@ -282,6 +283,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         gridAdapter.emojiTextSize = emojiSize
         gridAdapter.enableSkinTones = enableSkinTones
         gridAdapter.enableHaptics = enableHaptics
+        gridAdapter.enableAnimations = enableAnimations
         gridLayoutManager.spanCount = columns
 
         // Show/hide search

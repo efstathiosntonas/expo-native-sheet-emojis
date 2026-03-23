@@ -58,16 +58,19 @@ public class EmojiSheetModule: Module {
                 view.updateRecentLimit(limit ?? 30)
             }
             Prop("showSearch") { (view, show: Bool?) in
-                view.updateShowSearch(show ?? true)
+                view.updateShowSearch(show ?? false)
             }
             Prop("showRecents") { (view, show: Bool?) in
-                view.updateShowRecents(show ?? true)
+                view.updateShowRecents(show ?? false)
             }
             Prop("enableSkinTones") { (view, enable: Bool?) in
-                view.updateEnableSkinTones(enable ?? true)
+                view.updateEnableSkinTones(enable ?? false)
             }
             Prop("enableHaptics") { (view, enable: Bool?) in
-                view.updateEnableHaptics(enable ?? true)
+                view.updateEnableHaptics(enable ?? false)
+            }
+            Prop("enableAnimations") { (view, enable: Bool?) in
+                view.updateEnableAnimations(enable ?? false)
             }
             Prop("searchPlaceholder") { (view, text: String?) in
                 if let text { view.updateSearchPlaceholder(text) }
@@ -111,12 +114,13 @@ public class EmojiSheetModule: Module {
         let snapPoints = (options["snapPoints"] as? [Double]) ?? [0.5, 1.0]
         let columns = (options["columns"] as? Int) ?? 7
         let emojiSize = options["emojiSize"] as? Double ?? 32
-        let showSearch = (options["showSearch"] as? Bool) ?? true
-        let showRecents = (options["showRecents"] as? Bool) ?? true
-        let enableSkinTones = (options["enableSkinTones"] as? Bool) ?? true
+        let showSearch = (options["showSearch"] as? Bool) ?? false
+        let showRecents = (options["showRecents"] as? Bool) ?? false
+        let enableSkinTones = (options["enableSkinTones"] as? Bool) ?? false
         let enableHaptics = (options["enableHaptics"] as? Bool) ?? true
+        let enableAnimations = (options["enableAnimations"] as? Bool) ?? false
         let recentLimit = (options["recentLimit"] as? Int) ?? 30
-        let gestureEnabled = (options["gestureEnabled"] as? Bool) ?? true
+        let gestureEnabled = (options["gestureEnabled"] as? Bool) ?? false
         let backdropOpacity = options["backdropOpacity"] as? Double ?? (isDark ? 0.4 : 0.22)
         let categoryBarPosition = (options["categoryBarPosition"] as? String) ?? "top"
         let categoryNames = options["categoryNames"] as? [String: String]
@@ -180,6 +184,7 @@ public class EmojiSheetModule: Module {
         pickerView.showRecents = showRecents
         pickerView.enableSkinTones = enableSkinTones
         pickerView.enableHaptics = enableHaptics
+        pickerView.enableAnimations = enableAnimations
         pickerView.recentLimit = recentLimit
         pickerView.categoryBarPosition = categoryBarPosition
         pickerView.categoryNames = categoryNames

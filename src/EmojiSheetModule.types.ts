@@ -47,6 +47,7 @@ export type EmojiSheetPresentOptions = {
   showRecents?: boolean;
   enableSkinTones?: boolean;
   enableHaptics?: boolean;
+  enableAnimations?: boolean;
   gestureEnabled?: boolean;
   backdropOpacity?: number;
   excludeEmojis?: string[];
@@ -70,6 +71,7 @@ export type EmojiSheetViewProps = ViewProps & {
   showRecents?: boolean;
   enableSkinTones?: boolean;
   enableHaptics?: boolean;
+  enableAnimations?: boolean;
   excludeEmojis?: string[];
 };
 
@@ -84,6 +86,7 @@ export type EmojiSheetNativeViewProps = ViewProps & {
   showRecents?: boolean;
   enableSkinTones?: boolean;
   enableHaptics?: boolean;
+  enableAnimations?: boolean;
   searchPlaceholder?: string;
   noResultsText?: string;
   categoryNames?: Partial<Record<EmojiCategory, string>>;

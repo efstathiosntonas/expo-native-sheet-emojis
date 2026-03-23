@@ -26,6 +26,7 @@ class EmojiGridAdapter(
     var emojiTextSize: Float = 32f
     var enableSkinTones: Boolean = true
     var enableHaptics: Boolean = true
+    var enableAnimations: Boolean = false
 
     sealed class ListItem {
         data class Header(val title: String, val categoryKey: String) : ListItem()
@@ -118,6 +119,11 @@ class EmojiGridAdapter(
                 h.container.setOnClickListener { view ->
                     if (enableHaptics) {
                         view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
+                    }
+                    if (enableAnimations) {
+                        view.animate().scaleX(0.85f).scaleY(0.85f).setDuration(80).withEndAction {
+                            view.animate().scaleX(1f).scaleY(1f).setDuration(80).start()
+                        }.start()
                     }
                     onEmojiClick(item.emoji, item.id)
                 }

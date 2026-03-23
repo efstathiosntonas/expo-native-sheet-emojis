@@ -316,6 +316,7 @@ A declarative React component that renders the emoji picker inline.
 | showRecents | `boolean` | `true` | Whether to show the frequently used section |
 | enableSkinTones | `boolean` | `true` | Whether to enable skin tone selection on long press |
 | enableHaptics | `boolean` | `true` | Whether to trigger haptic feedback on emoji tap, long-press, and skin tone selection |
+| enableAnimations | `boolean` | `false` | Scale animation on emoji tap. Mostly useful for the embedded `EmojiSheetView` since the imperative sheet dismisses on selection before the animation completes. |
 | excludeEmojis | `string[]` | `[]` | Array of emoji IDs to exclude (e.g., `["pile_of_poo", "thumbs_down"]`) |
 
 ### EmojiSheetTheme
@@ -362,6 +363,7 @@ All theme fields with their purpose:
 | showRecents | `boolean` | `true` | Show the frequently used section |
 | enableSkinTones | `boolean` | `true` | Enable skin tone long-press |
 | enableHaptics | `boolean` | `true` | Haptic feedback on tap, long-press, and skin tone select |
+| enableAnimations | `boolean` | `false` | Scale animation on emoji tap (mainly useful for embedded `EmojiSheetView`) |
 | gestureEnabled | `boolean` | `true` | Allow swipe-to-dismiss gesture |
 | backdropOpacity | `number` | `0.22` | Opacity of the backdrop behind the sheet |
 | excludeEmojis | `string[]` | `[]` | Emoji IDs to hide from the picker |
@@ -400,6 +402,7 @@ Set via `categoryBarPosition: 'top'` or `categoryBarPosition: 'bottom'` in the o
 | showRecents | `boolean` | `true` | Show recents section |
 | enableSkinTones | `boolean` | `true` | Skin tone long-press |
 | enableHaptics | `boolean` | `true` | Haptic feedback on interactions |
+| enableAnimations | `boolean` | `false` | Scale animation on emoji tap (mainly useful for embedded `EmojiSheetView`) |
 | excludeEmojis | `string[]` | `[]` | Emoji IDs to exclude |
 | gestureEnabled | `boolean` | `true` | Swipe to dismiss |
 | backdropOpacity | `number` | `0.22` | Backdrop opacity |
