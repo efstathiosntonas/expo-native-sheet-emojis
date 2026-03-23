@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.3.0...v1.4.0) (2026-03-23)
+
+### Features
+
+* add 'system' theme option that follows device dark mode ([#7](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/7)) ([eff3c62](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/eff3c62c8474226f5f9ff348fcfa4cfdf8cfa70a))
+* add clearRecents() and clearSkinTonePreferences() APIs ([#8](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/8)) ([11eaa68](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/11eaa68b2f5aaa3af0b2162c4a3a1e8f4b5f5c1d))
+
 ## [1.3.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.2.1...v1.3.0) (2026-03-23)
 
 ### Features
