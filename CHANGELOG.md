@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.9.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.8.1...v1.9.0) (2026-03-23)
+
+### Features
+
+* concurrency modernization, enableAnimations prop, and review fixes ([#18](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/18)) ([cd72e27](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/cd72e27e133aa06584f2f739b4a6df290e3e02ad))
+
 ## [1.8.1](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.8.0...v1.8.1) (2026-03-23)
 
 ### Bug Fixes
