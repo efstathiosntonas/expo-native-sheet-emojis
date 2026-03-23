@@ -50,6 +50,7 @@ async function pickEmoji() {
   const result = await EmojiSheetModule.present({
     theme: 'dark',
     categoryBarPosition: 'top',
+    layoutDirection: 'auto',
   });
 
   if (!result.cancelled) {
@@ -70,6 +71,7 @@ function MyComponent() {
     <EmojiSheetView
       style={{ flex: 1 }}
       theme="light"
+      layoutDirection="auto"
       onEmojiSelected={(emoji) => console.log(emoji)}
       columns={7}
       showSearch={true}
@@ -309,6 +311,7 @@ A declarative React component that renders the emoji picker inline.
 | onDismiss | `() => void` | -- | Called when the picker is dismissed (View API only, not Embedded view) |
 | theme | `EmojiSheetTheme \| 'dark' \| 'light' \| 'system'` | `'light'` | Theme configuration |
 | translations | `EmojiSheetTranslations` | -- | Localized strings |
+| layoutDirection | `'auto' \| 'ltr' \| 'rtl'` | `'auto'` | UI layout direction. `'auto'` follows the device locale; use `'ltr'` or `'rtl'` to force a direction. |
 | categoryBarPosition | `'top' \| 'bottom'` | `'top'` | Position of the category tab bar |
 | columns | `number` | `7` | Number of emoji columns in the grid |
 | emojiSize | `number` | `32` | Size of each emoji cell in points |
@@ -356,6 +359,7 @@ All theme fields with their purpose:
 | theme | `EmojiSheetTheme \| 'dark' \| 'light' \| 'system'` | `'light'` | Theme configuration |
 | translations | `EmojiSheetTranslations` | -- | Localized UI strings |
 | snapPoints | `[number, number]` | `[0.5, 1.0]` | Bottom sheet snap points as screen fractions |
+| layoutDirection | `'auto' \| 'ltr' \| 'rtl'` | `'auto'` | UI layout direction. `'auto'` follows the device locale; use `'ltr'` or `'rtl'` to force a direction. |
 | categoryBarPosition | `'top' \| 'bottom'` | `'top'` | Position of the category tab bar |
 | columns | `number` | `7` | Number of columns in the emoji grid |
 | emojiSize | `number` | `32` | Emoji cell size in points |
@@ -388,6 +392,22 @@ The category bar can be placed at the **top** or **bottom** of the picker.
 
 Set via `categoryBarPosition: 'top'` or `categoryBarPosition: 'bottom'` in the options.
 
+## Layout Direction
+
+The picker supports automatic and forced layout direction:
+
+- `auto` (default): Follows the device locale/layout direction
+- `ltr`: Forces a left-to-right layout
+- `rtl`: Forces a right-to-left layout
+
+This affects the search bar, category strip, sticky category headers, and overall picker chrome on both iOS and Android.
+
+```typescript
+await EmojiSheetModule.present({
+  layoutDirection: 'rtl',
+});
+```
+
 ## Configuration Props
 
 | Prop | Type | Default | Description |
@@ -395,6 +415,7 @@ Set via `categoryBarPosition: 'top'` or `categoryBarPosition: 'bottom'` in the o
 | theme | `EmojiSheetTheme \| 'dark' \| 'light' \| 'system'` | `'light'` | Visual theme |
 | translations | `EmojiSheetTranslations` | -- | Localized strings |
 | snapPoints | `[number, number]` | `[0.5, 1.0]` | Sheet snap points |
+| layoutDirection | `'auto' \| 'ltr' \| 'rtl'` | `'auto'` | UI layout direction |
 | categoryBarPosition | `'top' \| 'bottom'` | `'top'` | Category bar placement |
 | columns | `number` | `7` | Grid column count |
 | emojiSize | `number` | `32` | Cell size (points) |

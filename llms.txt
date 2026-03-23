@@ -83,6 +83,7 @@ type EmojiSheetPresentOptions = {
   theme?: EmojiSheetTheme | 'dark' | 'light' | 'system';  // default: 'light'
   translations?: EmojiSheetTranslations;
   snapPoints?: [number, number];               // default: [0.5, 1.0] -- screen fractions
+  layoutDirection?: 'auto' | 'ltr' | 'rtl';   // default: 'auto' -- follows locale unless forced
   categoryBarPosition?: 'top' | 'bottom';      // default: 'top'
   columns?: number;                            // default: 7
   emojiSize?: number;                          // default: 32 (points)
@@ -106,6 +107,7 @@ type EmojiSheetViewProps = ViewProps & {
   onDismiss?: () => void;                        // called when picker is dismissed (View API only, not Embedded view)
   theme?: EmojiSheetTheme | 'dark' | 'light' | 'system';
   translations?: EmojiSheetTranslations;
+  layoutDirection?: 'auto' | 'ltr' | 'rtl';
   categoryBarPosition?: 'top' | 'bottom';
   columns?: number;
   emojiSize?: number;
@@ -128,6 +130,7 @@ import { EmojiSheetModule } from 'expo-native-sheet-emojis';
 
 const result = await EmojiSheetModule.present({
   theme: 'dark',
+  layoutDirection: 'auto',
   categoryBarPosition: 'bottom',
   excludeEmojis: ['pile_of_poo', 'thumbs_down'],
   translations: {
@@ -162,6 +165,7 @@ import { EmojiSheetView } from 'expo-native-sheet-emojis';
 <EmojiSheetView
   style={{ flex: 1 }}
   theme="light"
+  layoutDirection="auto"
   onEmojiSelected={(emoji) => console.log(emoji)}
   columns={7}
   emojiSize={32}
@@ -268,6 +272,14 @@ Examples: `grinning_face`, `thumbs_up`, `thumbs_down`, `pile_of_poo`, `red_heart
 
 - **top** (default): Inline strip below search bar, mirrors native keyboard layout
 - **bottom**: Floating rounded pill with blur backdrop (iOS) / elevation shadow (Android), hides during search
+
+## Layout Direction
+
+- **auto** (default): Follows the device locale/layout direction
+- **ltr**: Forces a left-to-right layout
+- **rtl**: Forces a right-to-left layout
+
+This applies to the search bar, category strip, sticky category headers, and surrounding picker chrome.
 
 ## Search Behavior
 
