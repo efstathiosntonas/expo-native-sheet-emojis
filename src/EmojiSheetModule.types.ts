@@ -36,7 +36,7 @@ export type EmojiSheetTranslations = {
 };
 
 export type EmojiSheetPresentOptions = {
-  theme?: EmojiSheetTheme | 'dark' | 'light';
+  theme?: EmojiSheetTheme | 'dark' | 'light' | 'system';
   translations?: EmojiSheetTranslations;
   snapPoints?: [number, number];
   categoryBarPosition?: 'top' | 'bottom';
@@ -60,7 +60,7 @@ export type EmojiSelectionListener = (event: { nativeEvent: { emoji: string } })
 
 export type EmojiSheetViewProps = ViewProps & {
   onEmojiSelected: (emoji: string) => void;
-  theme?: EmojiSheetTheme | 'dark' | 'light';
+  theme?: EmojiSheetTheme | 'dark' | 'light' | 'system';
   translations?: EmojiSheetTranslations;
   categoryBarPosition?: 'top' | 'bottom';
   columns?: number;
