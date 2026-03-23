@@ -103,7 +103,7 @@ type EmojiSheetResult =
 
 type EmojiSheetViewProps = ViewProps & {
   onEmojiSelected: (emoji: string) => void;    // required callback
-  onDismiss?: () => void;                        // called when picker is dismissed (View API only)
+  onDismiss?: () => void;                        // called when picker is dismissed (View API only, not Embedded view)
   theme?: EmojiSheetTheme | 'dark' | 'light' | 'system';
   translations?: EmojiSheetTranslations;
   categoryBarPosition?: 'top' | 'bottom';
