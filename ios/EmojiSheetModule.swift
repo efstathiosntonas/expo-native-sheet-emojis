@@ -58,16 +58,16 @@ public class EmojiSheetModule: Module {
                 view.updateRecentLimit(limit ?? 30)
             }
             Prop("showSearch") { (view, show: Bool?) in
-                view.updateShowSearch(show ?? false)
+                view.updateShowSearch(show ?? true)
             }
             Prop("showRecents") { (view, show: Bool?) in
-                view.updateShowRecents(show ?? false)
+                view.updateShowRecents(show ?? true)
             }
             Prop("enableSkinTones") { (view, enable: Bool?) in
-                view.updateEnableSkinTones(enable ?? false)
+                view.updateEnableSkinTones(enable ?? true)
             }
             Prop("enableHaptics") { (view, enable: Bool?) in
-                view.updateEnableHaptics(enable ?? false)
+                view.updateEnableHaptics(enable ?? true)
             }
             Prop("enableAnimations") { (view, enable: Bool?) in
                 view.updateEnableAnimations(enable ?? false)
@@ -114,13 +114,13 @@ public class EmojiSheetModule: Module {
         let snapPoints = (options["snapPoints"] as? [Double]) ?? [0.5, 1.0]
         let columns = (options["columns"] as? Int) ?? 7
         let emojiSize = options["emojiSize"] as? Double ?? 32
-        let showSearch = (options["showSearch"] as? Bool) ?? false
-        let showRecents = (options["showRecents"] as? Bool) ?? false
-        let enableSkinTones = (options["enableSkinTones"] as? Bool) ?? false
+        let showSearch = (options["showSearch"] as? Bool) ?? true
+        let showRecents = (options["showRecents"] as? Bool) ?? true
+        let enableSkinTones = (options["enableSkinTones"] as? Bool) ?? true
         let enableHaptics = (options["enableHaptics"] as? Bool) ?? true
         let enableAnimations = (options["enableAnimations"] as? Bool) ?? false
         let recentLimit = (options["recentLimit"] as? Int) ?? 30
-        let gestureEnabled = (options["gestureEnabled"] as? Bool) ?? false
+        let gestureEnabled = (options["gestureEnabled"] as? Bool) ?? true
         let backdropOpacity = options["backdropOpacity"] as? Double ?? (isDark ? 0.4 : 0.22)
         let categoryBarPosition = (options["categoryBarPosition"] as? String) ?? "top"
         let categoryNames = options["categoryNames"] as? [String: String]

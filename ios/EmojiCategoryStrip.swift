@@ -65,7 +65,7 @@ class EmojiCategoryStrip: UIView, UICollectionViewDataSource, UICollectionViewDe
             dividerLine.leadingAnchor.constraint(equalTo: leadingAnchor),
             dividerLine.trailingAnchor.constraint(equalTo: trailingAnchor),
             dividerLine.bottomAnchor.constraint(equalTo: bottomAnchor),
-            dividerLine.heightAnchor.constraint(equalToConstant: 1.0 / UIScreen.main.scale),
+            dividerLine.heightAnchor.constraint(equalToConstant: 0.5),
         ])
     }
 
