@@ -19,6 +19,7 @@ export default function EmojiSheetView({
   showSearch,
   showRecents,
   enableSkinTones,
+  enableHaptics,
   excludeEmojis,
   ...rest
 }: EmojiSheetViewProps) {
@@ -39,6 +40,7 @@ export default function EmojiSheetView({
       showSearch={showSearch}
       showRecents={showRecents}
       enableSkinTones={enableSkinTones}
+      enableHaptics={enableHaptics}
       excludeEmojis={excludeEmojis}
       searchPlaceholder={translations?.searchPlaceholder}
       noResultsText={translations?.noResultsText}

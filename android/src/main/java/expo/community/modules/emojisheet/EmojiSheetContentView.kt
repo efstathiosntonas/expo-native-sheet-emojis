@@ -63,6 +63,10 @@ class EmojiSheetContentView(
         pickerView.enableSkinTones = enable
     }
 
+    fun updateEnableHaptics(enable: Boolean) {
+        pickerView.enableHaptics = enable
+    }
+
     fun updateSearchPlaceholder(text: String) {
         pickerView.searchPlaceholder = text
     }

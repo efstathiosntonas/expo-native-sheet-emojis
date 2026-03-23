@@ -79,6 +79,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
     var showSearch: Boolean = true
     var showRecents: Boolean = true
     var enableSkinTones: Boolean = true
+    var enableHaptics: Boolean = true
     var recentLimit: Int = 30
     var categoryBarPosition: String = "top"
     var categoryNames: Map<String, String>? = null
@@ -280,6 +281,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         gridAdapter.spanCount = columns
         gridAdapter.emojiTextSize = emojiSize
         gridAdapter.enableSkinTones = enableSkinTones
+        gridAdapter.enableHaptics = enableHaptics
         gridLayoutManager.spanCount = columns
 
         // Show/hide search
@@ -612,8 +614,11 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
 
     private fun showSkinTonePicker(anchorView: View, baseEmoji: String, emojiId: String) {
         if (!enableSkinTones) return
+        if (enableHaptics) {
+            anchorView.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+        }
         val originalBase = findBaseEmoji(emojiId) ?: baseEmoji
-        val picker = EmojiSkinTonePicker(context, currentTheme) { selectedEmoji ->
+        val picker = EmojiSkinTonePicker(context, currentTheme, enableHaptics) { selectedEmoji ->
             trackFrequentlyUsed(emojiId)
             refreshVisibleItemsAfterUsage()
             val name = findEmojiName(emojiId) ?: ""

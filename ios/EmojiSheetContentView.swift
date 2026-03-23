@@ -73,6 +73,10 @@ class EmojiSheetContentView: ExpoView, EmojiSheetUIViewDelegate {
         pickerView.enableSkinTones = enable
     }
 
+    func updateEnableHaptics(_ enable: Bool) {
+        pickerView.enableHaptics = enable
+    }
+
     func updateSearchPlaceholder(_ text: String) {
         pickerView.searchPlaceholder = text
     }
