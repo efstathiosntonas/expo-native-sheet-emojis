@@ -3,6 +3,7 @@ package expo.community.modules.emojisheet
 import android.graphics.Canvas
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class StickyHeaderDecoration(
@@ -50,6 +51,11 @@ class StickyHeaderDecoration(
         val holder = adapter.createViewHolder(parent, EmojiGridAdapter.VIEW_TYPE_HEADER)
         adapter.bindViewHolder(holder, position)
         val view = holder.itemView
+        view.layoutDirection = parent.layoutDirection
+        if (view is TextView) {
+            view.textAlignment = View.TEXT_ALIGNMENT_VIEW_START
+            view.textDirection = View.TEXT_DIRECTION_LOCALE
+        }
         if (backgroundColor != 0) {
             view.setBackgroundColor(backgroundColor)
         }

@@ -41,6 +41,7 @@ class EmojiSearchBar: UIView, UITextFieldDelegate {
         textField.placeholder = "Search emoji"
         textField.borderStyle = .none
         textField.font = .systemFont(ofSize: 16)
+        textField.textAlignment = .natural
         textField.returnKeyType = .search
         textField.autocorrectionType = .no
         textField.autocapitalizationType = .none
@@ -94,6 +95,17 @@ class EmojiSearchBar: UIView, UITextFieldDelegate {
         iconView.tintColor = placeholderColor
         clearButton.tintColor = placeholderColor
         textField.tintColor = theme.selectionColor
+    }
+
+    func applyLayoutDirection(_ attribute: UISemanticContentAttribute) {
+        semanticContentAttribute = attribute
+        containerView.semanticContentAttribute = attribute
+        iconView.semanticContentAttribute = attribute
+        textField.semanticContentAttribute = attribute
+        clearButton.semanticContentAttribute = attribute
+        textField.textAlignment = UIView.userInterfaceLayoutDirection(for: attribute) == .rightToLeft
+            ? .right
+            : .left
     }
 
     @objc private func textFieldDidChange() {

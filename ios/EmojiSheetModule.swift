@@ -48,6 +48,9 @@ public class EmojiSheetModule: Module {
             Prop("categoryBarPosition") { (view, position: String?) in
                 view.updateCategoryBarPosition(position ?? "top")
             }
+            Prop("layoutDirection") { (view, direction: String?) in
+                view.updateLayoutDirection(direction ?? "auto")
+            }
             Prop("columns") { (view, columns: Int?) in
                 view.updateColumns(columns ?? 7)
             }
@@ -123,6 +126,7 @@ public class EmojiSheetModule: Module {
         let gestureEnabled = (options["gestureEnabled"] as? Bool) ?? true
         let backdropOpacity = options["backdropOpacity"] as? Double ?? (isDark ? 0.4 : 0.22)
         let categoryBarPosition = (options["categoryBarPosition"] as? String) ?? "top"
+        let layoutDirection = (options["layoutDirection"] as? String) ?? "auto"
         let categoryNames = options["categoryNames"] as? [String: String]
         let excludeEmojis = Set((options["excludeEmojis"] as? [String]) ?? [])
 
@@ -187,6 +191,7 @@ public class EmojiSheetModule: Module {
         pickerView.enableAnimations = enableAnimations
         pickerView.recentLimit = recentLimit
         pickerView.categoryBarPosition = categoryBarPosition
+        pickerView.layoutDirection = layoutDirection
         pickerView.categoryNames = categoryNames
         pickerView.excludeEmojis = excludeEmojis
         pickerView.applyCustomTheme(customTheme)

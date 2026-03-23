@@ -38,6 +38,7 @@ function flattenOptions(options: EmojiSheetPresentOptions): NativeOptions {
   }
 
   // Layout & behavior
+  if (options.layoutDirection) flat.layoutDirection = options.layoutDirection;
   if (options.snapPoints) flat.snapPoints = options.snapPoints;
   if (options.categoryBarPosition) flat.categoryBarPosition = options.categoryBarPosition;
   if (options.columns != null) flat.columns = options.columns;

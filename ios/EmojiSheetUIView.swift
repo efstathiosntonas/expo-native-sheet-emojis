@@ -68,6 +68,9 @@ class EmojiSheetUIView: UIView,
     var categoryBarPosition: String = "top" {
         didSet { if categoryBarPosition != oldValue { configureLayout() } }
     }
+    var layoutDirection: String = "auto" {
+        didSet { applyLayoutDirection() }
+    }
     var categoryNames: [String: String]?
     var excludeEmojis: Set<String> = []
 
@@ -150,6 +153,24 @@ class EmojiSheetUIView: UIView,
         gridView.delegate = self
 
         configureLayout()
+        applyLayoutDirection()
+    }
+
+    private func applyLayoutDirection() {
+        let attribute: UISemanticContentAttribute
+        switch layoutDirection {
+        case "rtl":
+            attribute = .forceRightToLeft
+        case "ltr":
+            attribute = .forceLeftToRight
+        default:
+            attribute = .unspecified
+        }
+
+        semanticContentAttribute = attribute
+        searchBar.applyLayoutDirection(attribute)
+        categoryStrip.applyLayoutDirection(attribute)
+        gridView.applyLayoutDirection(attribute)
     }
 
     private func configureLayout() {

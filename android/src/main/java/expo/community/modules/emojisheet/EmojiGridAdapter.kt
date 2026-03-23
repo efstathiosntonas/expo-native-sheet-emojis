@@ -69,6 +69,9 @@ class EmojiGridAdapter(
                 val tv = TextView(parent.context).apply {
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
                     typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+                    gravity = Gravity.START or Gravity.CENTER_VERTICAL
+                    textAlignment = View.TEXT_ALIGNMENT_VIEW_START
+                    textDirection = View.TEXT_DIRECTION_LOCALE
                     val pad = (16 * density).toInt()
                     setPadding(pad, pad, pad, (8 * density).toInt())
                     layoutParams = RecyclerView.LayoutParams(

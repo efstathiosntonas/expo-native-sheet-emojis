@@ -82,6 +82,12 @@ class EmojiCategoryStrip: UIView, UICollectionViewDataSource, UICollectionViewDe
         collectionView.reloadData()
     }
 
+    func applyLayoutDirection(_ attribute: UISemanticContentAttribute) {
+        semanticContentAttribute = attribute
+        collectionView.semanticContentAttribute = attribute
+        collectionView.collectionViewLayout.invalidateLayout()
+    }
+
     func selectCategory(at index: Int) {
         guard !isSearchActive, index != selectedIndex, index >= 0, index < categoryKeys.count else { return }
         selectedIndex = index
