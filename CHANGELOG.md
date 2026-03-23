@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.1](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v2.0.0...v2.0.1) (2026-03-23)
+
+### Chores
+
+* **pkg:** exclude android assets translations from npm publish ([#20](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/20)) ([7f09a63](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/7f09a63c433c7b00695826f4dbb51b492ef59aae))
+
 ## [2.0.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.9.0...v2.0.0) (2026-03-23)
 
 ### Features
