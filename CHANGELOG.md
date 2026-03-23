@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.6.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.4.0...v1.6.0) (2026-03-23)
+
+### Features
+
+* add scale animation on emoji tap ([#9](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/9)) ([037368d](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/037368d01a4123f334032e9205e5de85d55777b3))
+
+### Bug Fixes
+
+* **ios:** replace deprecated UIScreen.main.scale with 0.5pt hairline ([#10](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/10)) ([1ae1448](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/1ae14489e45c08a7f628c6a73ddd795a223ec6ee))
+
+## [1.5.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.4.0...v1.5.0) (2026-03-23)
+
+### Features
+
+* add scale animation on emoji tap ([#9](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/9)) ([037368d](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/037368d01a4123f334032e9205e5de85d55777b3))
+
+### Bug Fixes
+
+* **ios:** replace deprecated UIScreen.main.scale with 0.5pt hairline ([#10](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/10)) ([1ae1448](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/1ae14489e45c08a7f628c6a73ddd795a223ec6ee))
+
 ## [1.4.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.3.0...v1.4.0) (2026-03-23)
 
 ### Features
