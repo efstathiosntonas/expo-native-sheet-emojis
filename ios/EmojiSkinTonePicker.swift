@@ -2,6 +2,7 @@ import UIKit
 
 class EmojiSkinTonePicker: UIView {
     var onEmojiSelected: ((_ emoji: String, _ modifier: String?) -> Void)?
+    var enableHaptics: Bool = true
 
     private let baseEmoji: String
     private let emojiId: String
@@ -94,6 +95,9 @@ class EmojiSkinTonePicker: UIView {
     }
 
     @objc private func buttonTapped(_ sender: UIButton) {
+        if enableHaptics {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        }
         let tag = sender.tag
         if tag == 0 {
             // Base emoji, no modifier

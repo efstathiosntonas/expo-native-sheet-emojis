@@ -25,6 +25,7 @@ class EmojiGridAdapter(
     var spanCount: Int = 7
     var emojiTextSize: Float = 32f
     var enableSkinTones: Boolean = true
+    var enableHaptics: Boolean = true
 
     sealed class ListItem {
         data class Header(val title: String, val categoryKey: String) : ListItem()
@@ -114,11 +115,14 @@ class EmojiGridAdapter(
                 // Prevent theme text color from washing out color emojis
                 h.textView.setTextColor(Color.BLACK)
                 h.textView.alpha = 1.0f
-                h.container.setOnClickListener {
+                h.container.setOnClickListener { view ->
+                    if (enableHaptics) {
+                        view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
+                    }
                     onEmojiClick(item.emoji, item.id)
                 }
                 if (item.toneEnabled && enableSkinTones) {
-                    h.container.setOnLongClickListener {
+                    h.container.setOnLongClickListener { view ->
                         onEmojiLongPress(h.container, item.emoji, item.id)
                         true
                     }

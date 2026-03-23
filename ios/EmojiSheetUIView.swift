@@ -58,6 +58,9 @@ class EmojiSheetUIView: UIView,
     var enableSkinTones: Bool = true {
         didSet { gridView.enableSkinTones = enableSkinTones }
     }
+    var enableHaptics: Bool = true {
+        didSet { gridView.enableHaptics = enableHaptics }
+    }
     var recentLimit: Int = 30
     var categoryBarPosition: String = "top" {
         didSet { if categoryBarPosition != oldValue { configureLayout() } }

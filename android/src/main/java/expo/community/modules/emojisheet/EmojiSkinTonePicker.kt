@@ -17,6 +17,7 @@ import androidx.appcompat.widget.AppCompatTextView
 class EmojiSkinTonePicker(
     private val context: Context,
     private val theme: EmojiSheetTheme,
+    private val enableHaptics: Boolean = true,
     private val onToneSelected: (emoji: String) -> Unit
 ) {
     companion object {
@@ -95,7 +96,10 @@ class EmojiSkinTonePicker(
         // Set click listeners now that popup exists
         for (i in 0 until container.childCount) {
             val (variantEmoji, toneCodePoint) = variants[i]
-            (container.getChildAt(i) as View).setOnClickListener {
+            (container.getChildAt(i) as View).setOnClickListener { view ->
+                if (enableHaptics) {
+                    view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
+                }
                 if (toneCodePoint != -1) {
                     saveTone(context, emojiId, toneCodePoint)
                 } else {

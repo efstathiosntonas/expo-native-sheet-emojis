@@ -19,6 +19,10 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
         didSet { if cellHeight != oldValue { rebuildLayout() } }
     }
     var enableSkinTones: Bool = true
+    var enableHaptics: Bool = true
+
+    private lazy var selectionFeedback = UISelectionFeedbackGenerator()
+    private lazy var impactFeedbackMedium = UIImpactFeedbackGenerator(style: .medium)
 
     private var sections: [EmojiSection] = []
     private var categoryNames: [String: String] = [:]
@@ -231,6 +235,9 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
     // MARK: - UICollectionViewDelegate
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if enableHaptics {
+            selectionFeedback.selectionChanged()
+        }
         let item = sections[indexPath.section].data[indexPath.item]
         var emoji = item.emoji
         if item.toneEnabled, let savedTone = UserDefaults.standard.string(forKey: "EmojiSkinTone_\(item.id)") {
@@ -329,11 +336,16 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
         guard let cell = collectionView.cellForItem(at: indexPath) else { return }
         let cellFrameInSelf = collectionView.convert(cell.frame, to: self)
 
+        if enableHaptics {
+            impactFeedbackMedium.impactOccurred()
+        }
+
         let picker = EmojiSkinTonePicker(
             baseEmoji: item.emoji,
             emojiId: item.id,
             theme: currentTheme
         )
+        picker.enableHaptics = enableHaptics
         picker.onEmojiSelected = { [weak self] emoji, modifier in
             guard let self = self else { return }
             if let modifier = modifier {

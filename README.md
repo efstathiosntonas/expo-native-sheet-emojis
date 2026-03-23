@@ -303,6 +303,7 @@ A declarative React component that renders the emoji picker inline.
 | showSearch | `boolean` | `true` | Whether to show the search bar |
 | showRecents | `boolean` | `true` | Whether to show the frequently used section |
 | enableSkinTones | `boolean` | `true` | Whether to enable skin tone selection on long press |
+| enableHaptics | `boolean` | `true` | Whether to trigger haptic feedback on emoji tap, long-press, and skin tone selection |
 | excludeEmojis | `string[]` | `[]` | Array of emoji IDs to exclude (e.g., `["pile_of_poo", "thumbs_down"]`) |
 
 ### EmojiSheetTheme
@@ -348,6 +349,7 @@ All theme fields with their purpose:
 | showSearch | `boolean` | `true` | Show the search bar |
 | showRecents | `boolean` | `true` | Show the frequently used section |
 | enableSkinTones | `boolean` | `true` | Enable skin tone long-press |
+| enableHaptics | `boolean` | `true` | Haptic feedback on tap, long-press, and skin tone select |
 | gestureEnabled | `boolean` | `true` | Allow swipe-to-dismiss gesture |
 | backdropOpacity | `number` | `0.22` | Opacity of the backdrop behind the sheet |
 | excludeEmojis | `string[]` | `[]` | Emoji IDs to hide from the picker |
@@ -385,6 +387,7 @@ Set via `categoryBarPosition: 'top'` or `categoryBarPosition: 'bottom'` in the o
 | showSearch | `boolean` | `true` | Show search bar |
 | showRecents | `boolean` | `true` | Show recents section |
 | enableSkinTones | `boolean` | `true` | Skin tone long-press |
+| enableHaptics | `boolean` | `true` | Haptic feedback on interactions |
 | excludeEmojis | `string[]` | `[]` | Emoji IDs to exclude |
 | gestureEnabled | `boolean` | `true` | Swipe to dismiss |
 | backdropOpacity | `number` | `0.22` | Backdrop opacity |
