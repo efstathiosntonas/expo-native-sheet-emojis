@@ -97,6 +97,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
     private val recyclerView: RecyclerView
     private val gridAdapter: EmojiGridAdapter
     private val gridLayoutManager: GridLayoutManager
+    private val stickyHeaderDecoration: StickyHeaderDecoration
     private val emptyStateLabel: TextView
     private val contentFrame: FrameLayout
 
@@ -156,6 +157,8 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         recyclerView = RecyclerView(context).apply {
             layoutManager = gridLayoutManager
             adapter = gridAdapter
+            stickyHeaderDecoration = StickyHeaderDecoration(gridAdapter, currentTheme.backgroundColor)
+            addItemDecoration(stickyHeaderDecoration)
             setHasFixedSize(false)
             overScrollMode = View.OVER_SCROLL_NEVER
             isNestedScrollingEnabled = true
@@ -411,6 +414,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         categoryStrip.applyTheme(theme)
         gridAdapter.updateTheme(theme)
         recyclerView.setBackgroundColor(theme.backgroundColor)
+        stickyHeaderDecoration.backgroundColor = theme.backgroundColor
         emptyStateLabel.setTextColor(theme.textSecondaryColor)
     }
 
