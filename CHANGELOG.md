@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.2.1](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.2.0...v1.2.1) (2026-03-23)
+
+### Bug Fixes
+
+* **android:** replace deprecated SOFT_INPUT_ADJUST_RESIZE with WindowInsetsCompat ([#5](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/5)) ([6e05a4f](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/6e05a4f8bebfcd88d4e0b27212945dccb674096a))
+
+### Chores
+
+* **android:** bump default compile/target SDK to 35, min to 24 ([#4](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/4)) ([061d12d](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/061d12d1ba69e651dd524abccb60b36e91649c81))
+
 ## [1.2.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.1.0...v1.2.0) (2026-03-23)
 
 ### Features
