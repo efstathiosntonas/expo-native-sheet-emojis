@@ -21,6 +21,9 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
     var enableSkinTones: Bool = true
     var enableHaptics: Bool = true
 
+    private lazy var selectionFeedback = UISelectionFeedbackGenerator()
+    private lazy var impactFeedbackMedium = UIImpactFeedbackGenerator(style: .medium)
+
     private var sections: [EmojiSection] = []
     private var categoryNames: [String: String] = [:]
     private var currentTheme: EmojiSheetTheme = .light
@@ -233,7 +236,7 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if enableHaptics {
-            UISelectionFeedbackGenerator().selectionChanged()
+            selectionFeedback.selectionChanged()
         }
         let item = sections[indexPath.section].data[indexPath.item]
         var emoji = item.emoji
@@ -334,7 +337,7 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
         let cellFrameInSelf = collectionView.convert(cell.frame, to: self)
 
         if enableHaptics {
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            impactFeedbackMedium.impactOccurred()
         }
 
         let picker = EmojiSkinTonePicker(
