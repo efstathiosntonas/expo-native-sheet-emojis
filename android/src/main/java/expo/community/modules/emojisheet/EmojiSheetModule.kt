@@ -53,7 +53,13 @@ class EmojiSheetModule : Module() {
 
             View(EmojiSheetContentView::class) {
                 Prop("theme") { view: EmojiSheetContentView, theme: String? ->
-                    view.updateTheme(theme ?: "light")
+                    val resolved = if (theme == "system") {
+                        val uiMode = view.context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+                        if (uiMode == android.content.res.Configuration.UI_MODE_NIGHT_YES) "dark" else "light"
+                    } else {
+                        theme ?: "light"
+                    }
+                    view.updateTheme(resolved)
                 }
                 Prop("categoryBarPosition") { view: EmojiSheetContentView, position: String? ->
                     view.updateCategoryBarPosition(position ?: "top")
@@ -97,7 +103,15 @@ class EmojiSheetModule : Module() {
 
     private fun presentSheet(options: Map<String, Any>, promise: Promise) {
         val activity = appContext.currentActivity ?: return
-        val isDark = options["theme"] == "dark"
+        val themeString = options["theme"] as? String ?: "light"
+        val isDark = when (themeString) {
+            "dark" -> true
+            "system" -> {
+                val uiMode = activity.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+                uiMode == android.content.res.Configuration.UI_MODE_NIGHT_YES
+            }
+            else -> false
+        }
         val density = activity.resources.displayMetrics.density
 
         // Parse new options

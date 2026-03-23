@@ -80,7 +80,7 @@ type EmojiSheetTranslations = {
 };
 
 type EmojiSheetPresentOptions = {
-  theme?: EmojiSheetTheme | 'dark' | 'light';  // default: 'light'
+  theme?: EmojiSheetTheme | 'dark' | 'light' | 'system';  // default: 'light'
   translations?: EmojiSheetTranslations;
   snapPoints?: [number, number];               // default: [0.5, 1.0] -- screen fractions
   categoryBarPosition?: 'top' | 'bottom';      // default: 'top'
@@ -102,7 +102,7 @@ type EmojiSheetResult =
 
 type EmojiSheetViewProps = ViewProps & {
   onEmojiSelected: (emoji: string) => void;    // required callback
-  theme?: EmojiSheetTheme | 'dark' | 'light';
+  theme?: EmojiSheetTheme | 'dark' | 'light' | 'system';
   translations?: EmojiSheetTranslations;
   categoryBarPosition?: 'top' | 'bottom';
   columns?: number;

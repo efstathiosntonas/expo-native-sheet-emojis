@@ -25,7 +25,13 @@ public class EmojiSheetModule: Module {
 
         View(EmojiSheetContentView.self) {
             Prop("theme") { (view, theme: String?) in
-                view.updateTheme(theme ?? "light")
+                let resolved: String
+                if theme == "system" {
+                    resolved = UITraitCollection.current.userInterfaceStyle == .dark ? "dark" : "light"
+                } else {
+                    resolved = theme ?? "light"
+                }
+                view.updateTheme(resolved)
             }
             Prop("categoryBarPosition") { (view, position: String?) in
                 view.updateCategoryBarPosition(position ?? "top")
@@ -78,7 +84,16 @@ public class EmojiSheetModule: Module {
             return
         }
 
-        let isDark = (options["theme"] as? String) == "dark"
+        let themeString = options["theme"] as? String ?? "light"
+        let isDark: Bool
+        switch themeString {
+        case "dark":
+            isDark = true
+        case "system":
+            isDark = UITraitCollection.current.userInterfaceStyle == .dark
+        default:
+            isDark = false
+        }
 
         // Parse new options
         let snapPoints = (options["snapPoints"] as? [Double]) ?? [0.5, 1.0]

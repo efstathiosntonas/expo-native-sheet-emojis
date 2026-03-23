@@ -294,7 +294,7 @@ A declarative React component that renders the emoji picker inline.
 | Prop | Type | Default | Description |
 |-|-|-|-|
 | onEmojiSelected | `(emoji: string) => void` | required | Called when an emoji is tapped |
-| theme | `EmojiSheetTheme \| 'dark' \| 'light'` | `'light'` | Theme configuration |
+| theme | `EmojiSheetTheme \| 'dark' \| 'light' \| 'system'` | `'light'` | Theme configuration |
 | translations | `EmojiSheetTranslations` | -- | Localized strings |
 | categoryBarPosition | `'top' \| 'bottom'` | `'top'` | Position of the category tab bar |
 | columns | `number` | `7` | Number of emoji columns in the grid |
@@ -339,7 +339,7 @@ All theme fields with their purpose:
 
 | Field | Type | Default | Description |
 |-|-|-|-|
-| theme | `EmojiSheetTheme \| 'dark' \| 'light'` | `'light'` | Theme configuration |
+| theme | `EmojiSheetTheme \| 'dark' \| 'light' \| 'system'` | `'light'` | Theme configuration |
 | translations | `EmojiSheetTranslations` | -- | Localized UI strings |
 | snapPoints | `[number, number]` | `[0.5, 1.0]` | Bottom sheet snap points as screen fractions |
 | categoryBarPosition | `'top' \| 'bottom'` | `'top'` | Position of the category tab bar |
@@ -377,7 +377,7 @@ Set via `categoryBarPosition: 'top'` or `categoryBarPosition: 'bottom'` in the o
 
 | Prop | Type | Default | Description |
 |-|-|-|-|
-| theme | `EmojiSheetTheme \| 'dark' \| 'light'` | `'light'` | Visual theme |
+| theme | `EmojiSheetTheme \| 'dark' \| 'light' \| 'system'` | `'light'` | Visual theme |
 | translations | `EmojiSheetTranslations` | -- | Localized strings |
 | snapPoints | `[number, number]` | `[0.5, 1.0]` | Sheet snap points |
 | categoryBarPosition | `'top' \| 'bottom'` | `'top'` | Category bar placement |
