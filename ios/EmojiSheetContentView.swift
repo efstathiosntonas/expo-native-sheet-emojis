@@ -22,6 +22,7 @@ struct EmojiSection: Sendable {
 class EmojiSheetContentView: ExpoView, EmojiSheetUIViewDelegate {
     let onEmojiSelected = EventDispatcher()
     let onDismiss = EventDispatcher()
+    let onOpen = EventDispatcher()
     private let pickerView = EmojiSheetUIView()
 
     required init(appContext: AppContext? = nil) {
@@ -40,6 +41,13 @@ class EmojiSheetContentView: ExpoView, EmojiSheetUIViewDelegate {
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        if window != nil {
+            onOpen([:])
+        }
     }
 
     func updateTheme(_ theme: String) {
