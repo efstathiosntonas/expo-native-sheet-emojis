@@ -84,7 +84,7 @@ public class EmojiSheetModule: Module {
             Prop("excludeEmojis") { (view, ids: [String]?) in
                 view.updateExcludeEmojis(ids ?? [])
             }
-            Events("onEmojiSelected")
+            Events("onEmojiSelected", "onDismiss")
         }
     }
 

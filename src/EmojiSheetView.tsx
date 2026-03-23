@@ -10,6 +10,7 @@ const NativeView: React.ComponentType<EmojiSheetNativeViewProps> =
 
 export default function EmojiSheetView({
   onEmojiSelected,
+  onDismiss,
   theme,
   translations,
   categoryBarPosition,
@@ -50,6 +51,7 @@ export default function EmojiSheetView({
       onEmojiSelected={({ nativeEvent }) => {
         onEmojiSelected(nativeEvent.emoji);
       }}
+      onDismiss={onDismiss ? () => onDismiss() : undefined}
     />
   );
 }

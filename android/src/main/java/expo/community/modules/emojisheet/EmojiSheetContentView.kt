@@ -13,6 +13,7 @@ class EmojiSheetContentView(
 ) : ExpoView(context, appContext) {
 
     private val onEmojiSelected by EventDispatcher()
+    private val onDismiss by EventDispatcher()
     private val pickerView = EmojiSheetUIView(context)
 
     init {

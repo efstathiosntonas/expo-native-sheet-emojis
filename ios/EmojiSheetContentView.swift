@@ -21,6 +21,7 @@ struct EmojiSection {
 
 class EmojiSheetContentView: ExpoView, EmojiSheetUIViewDelegate {
     let onEmojiSelected = EventDispatcher()
+    let onDismiss = EventDispatcher()
     private let pickerView = EmojiSheetUIView()
 
     required init(appContext: AppContext? = nil) {
