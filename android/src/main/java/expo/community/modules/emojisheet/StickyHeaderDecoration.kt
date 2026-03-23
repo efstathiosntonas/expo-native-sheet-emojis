@@ -6,7 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
 class StickyHeaderDecoration(
-    private val adapter: EmojiGridAdapter
+    private val adapter: EmojiGridAdapter,
+    var backgroundColor: Int = 0
 ) : RecyclerView.ItemDecoration() {
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
@@ -57,6 +58,9 @@ class StickyHeaderDecoration(
     private fun createHeaderView(parent: RecyclerView, position: Int): View {
         val holder = adapter.createViewHolder(parent, EmojiGridAdapter.VIEW_TYPE_HEADER)
         adapter.bindViewHolder(holder, position)
+        if (backgroundColor != 0) {
+            holder.itemView.setBackgroundColor(backgroundColor)
+        }
         return holder.itemView
     }
 
