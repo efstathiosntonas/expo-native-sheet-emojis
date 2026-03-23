@@ -47,6 +47,7 @@ function flattenOptions(options: EmojiSheetPresentOptions): NativeOptions {
   if (options.showRecents != null) flat.showRecents = options.showRecents;
   if (options.enableSkinTones != null) flat.enableSkinTones = options.enableSkinTones;
   if (options.enableHaptics != null) flat.enableHaptics = options.enableHaptics;
+  if (options.enableAnimations != null) flat.enableAnimations = options.enableAnimations;
   if (options.gestureEnabled != null) flat.gestureEnabled = options.gestureEnabled;
   if (options.backdropOpacity != null) flat.backdropOpacity = options.backdropOpacity;
   if (options.excludeEmojis) flat.excludeEmojis = options.excludeEmojis;

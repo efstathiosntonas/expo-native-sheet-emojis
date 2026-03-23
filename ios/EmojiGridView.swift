@@ -20,6 +20,7 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
     }
     var enableSkinTones: Bool = true
     var enableHaptics: Bool = true
+    var enableAnimations: Bool = true
 
     private lazy var selectionFeedback = UISelectionFeedbackGenerator()
     private lazy var impactFeedbackMedium = UIImpactFeedbackGenerator(style: .medium)
@@ -238,7 +239,7 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
         if enableHaptics {
             selectionFeedback.selectionChanged()
         }
-        if let cell = collectionView.cellForItem(at: indexPath) {
+        if enableAnimations, let cell = collectionView.cellForItem(at: indexPath) {
             UIView.animate(withDuration: 0.08, delay: 0, options: [.allowUserInteraction]) {
                 cell.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
             } completion: { _ in
