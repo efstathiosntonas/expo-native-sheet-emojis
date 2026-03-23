@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.7.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.6.0...v1.7.0) (2026-03-23)
+
+### Features
+
+* add onDismiss event to declarative EmojiSheetView component ([#15](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/15)) ([6646551](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/6646551509828a143e042b0993ef4bff031ddfc8))
+* **android:** add sticky section headers to match iOS behavior ([#12](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/12)) ([a930462](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/a930462606fffc68e8ea292c28218881cb9c3ab2))
+
+### Bug Fixes
+
+* **android:** clamp sticky header translation to prevent upward jump ([#14](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/14)) ([1ad4331](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/1ad43312b6bf8bb9ad8298f926b30c904e491a2b))
+* **android:** replace legacy search icon with Material Design vector ([#11](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/11)) ([7ac9e21](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/7ac9e21c82d069b5ffa8322f2810ccc4847b2516))
+
+### Chores
+
+* **android:** bump material library to 1.12.0 ([#13](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/13)) ([30326c9](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/30326c984077611dfed63933b2e4fc0cb05413eb))
+
 ## [1.6.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.4.0...v1.6.0) (2026-03-23)
 
 ### Features
