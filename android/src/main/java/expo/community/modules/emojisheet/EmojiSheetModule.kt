@@ -51,6 +51,18 @@ class EmojiSheetModule : Module() {
                 }
             }
 
+            AsyncFunction("clearRecents") {
+                val ctx = appContext.reactContext ?: return@AsyncFunction
+                ctx.getSharedPreferences("emoji_sheet_frequently_used", android.content.Context.MODE_PRIVATE)
+                    .edit().clear().apply()
+            }
+
+            AsyncFunction("clearSkinTonePreferences") {
+                val ctx = appContext.reactContext ?: return@AsyncFunction
+                ctx.getSharedPreferences("emoji_sheet_skin_tones", android.content.Context.MODE_PRIVATE)
+                    .edit().clear().apply()
+            }
+
             View(EmojiSheetContentView::class) {
                 Prop("theme") { view: EmojiSheetContentView, theme: String? ->
                     val resolved = if (theme == "system") {
