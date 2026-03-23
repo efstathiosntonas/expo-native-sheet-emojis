@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.2.1...v1.3.0) (2026-03-23)
+
+### Features
+
+* add enableHaptics prop for configurable haptic feedback ([#6](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/6)) ([e803a70](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/e803a70e18d8ff5d865cef7dd8305d334c0d0a22))
+
 ## [1.2.1](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v1.2.0...v1.2.1) (2026-03-23)
 
 ### Bug Fixes
