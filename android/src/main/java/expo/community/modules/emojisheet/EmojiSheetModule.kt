@@ -8,6 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.WindowManager
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -240,6 +243,18 @@ class EmojiSheetModule : Module() {
 
         bottomSheet.setContentView(container)
 
+        ViewCompat.setOnApplyWindowInsetsListener(container) { view, insets ->
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(
+                systemBarInsets.left,
+                0,
+                systemBarInsets.right,
+                maxOf(imeInsets.bottom, systemBarInsets.bottom)
+            )
+            WindowInsetsCompat.CONSUMED
+        }
+
         // Strip ALL backgrounds from BottomSheet internals
         bottomSheet.setOnShowListener { dlg ->
             val d = dlg as BottomSheetDialog
@@ -252,7 +267,9 @@ class EmojiSheetModule : Module() {
             pickerView.loadDataAsync()
         }
 
-        bottomSheet.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        bottomSheet.window?.let { window ->
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+        }
         bottomSheet.window?.setDimAmount(backdropOpacity)
 
         bottomSheet.behavior.apply {
