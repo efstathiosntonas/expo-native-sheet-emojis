@@ -466,10 +466,6 @@ if (result.type === 'plus') {
 }
 ```
 
-## Related Projects
-
-- [expo-native-emojis-popup](https://github.com/efstathiosntonas/expo-native-emojis-popup) -- Companion quick reaction popup (long-press drag-to-select, hover labels, spring animations, anchor-based positioning)
-
 ## LLM / AI Agent Reference
 
 If you're an AI agent or using an LLM to integrate this module, see [llms.txt](https://raw.githubusercontent.com/efstathiosntonas/expo-native-sheet-emojis/refs/heads/main/llms.txt) for a concise, structured reference with all types, APIs, and usage patterns.
