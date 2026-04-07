@@ -6,7 +6,7 @@ A fully native emoji picker bottom sheet for React Native. Built entirely in Swi
 
 ## Highlights
 
-- **1900+ emojis** across 9 categories (Unicode Emoji up to v16.0), rendered at 60+ FPS
+- **1900+ emojis** across 9 categories (Unicode Emoji up to v16.0)
 - **60+ FPS everywhere** -- native UICollectionView (iOS) and RecyclerView (Android) with no JS bridge involvement during scrolling, searching, or animations
 - Fully native on both platforms -- no JavaScript emoji rendering, no web views, no React re-renders
 - Search across 21 languages powered by [Unicode CLDR](https://cldr.unicode.org/) -- the industry-standard source for emoji annotations used by iOS, Android, and major platforms. Runs on a background thread to keep the UI thread free
