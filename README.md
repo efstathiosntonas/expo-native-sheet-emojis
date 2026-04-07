@@ -431,6 +431,45 @@ await EmojiSheetModule.present({
 | gestureEnabled | `boolean` | `true` | Swipe to dismiss |
 | backdropOpacity | `number` | `0.22` | Backdrop opacity |
 
+## Companion: expo-native-emojis-popup
+
+For quick emoji reactions (like message reaction trays), the companion module [expo-native-emojis-popup](https://github.com/efstathiosntonas/expo-native-emojis-popup) provides a fully native emoji reaction popup with long-press drag-to-select, hover labels, and spring animations.
+
+Together they form a complete reaction system:
+
+1. User long-presses a message/post -> `expo-native-emojis-popup` shows the quick reaction tray
+2. User taps the plus button -> your app presents `expo-native-sheet-emojis` for the full emoji catalog
+3. Selected emoji flows back into your reaction system
+
+```typescript
+import { EmojisPopupModule } from 'expo-native-emojis-popup';
+import { EmojiSheetModule } from 'expo-native-sheet-emojis';
+
+const result = await EmojisPopupModule.show({
+  anchorId: 'message:42',
+  items: [
+    { emoji: '❤️', emoji_name: 'Red Heart', id: 'heart' },
+    { emoji: '👍', emoji_name: 'Thumbs Up', id: 'thumbsup' },
+    { emoji: '😂', emoji_name: 'Face with Tears of Joy', id: 'laugh' },
+  ],
+  plusEnabled: true,
+});
+
+if (result.type === 'plus') {
+  // Open the full emoji picker
+  const sheetResult = await EmojiSheetModule.present({ theme: 'dark' });
+  if (!sheetResult.cancelled) {
+    handleReaction(sheetResult.emoji);
+  }
+} else if (result.type === 'select') {
+  handleReaction(result.id);
+}
+```
+
+## Related Projects
+
+- [expo-native-emojis-popup](https://github.com/efstathiosntonas/expo-native-emojis-popup) -- Companion quick reaction popup (long-press drag-to-select, hover labels, spring animations, anchor-based positioning)
+
 ## LLM / AI Agent Reference
 
 If you're an AI agent or using an LLM to integrate this module, see [llms.txt](https://raw.githubusercontent.com/efstathiosntonas/expo-native-sheet-emojis/refs/heads/main/llms.txt) for a concise, structured reference with all types, APIs, and usage patterns.

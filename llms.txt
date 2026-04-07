@@ -299,6 +299,36 @@ Search is relevance-ranked with the following scoring:
 
 Search runs on a background thread. Results scroll to top automatically.
 
+## Companion: expo-native-emojis-popup
+
+For quick emoji reactions (like message reaction trays), pair with [expo-native-emojis-popup](https://github.com/efstathiosntonas/expo-native-emojis-popup) -- a fully native emoji reaction popup with long-press drag-to-select, hover labels, and spring animations.
+
+Together they form a complete reaction system:
+
+```typescript
+import { EmojisPopupModule } from 'expo-native-emojis-popup';
+import { EmojiSheetModule } from 'expo-native-sheet-emojis';
+
+const result = await EmojisPopupModule.show({
+  anchorId: 'message:42',
+  items: [
+    { emoji: '❤️', emoji_name: 'Red Heart', id: 'heart' },
+    { emoji: '👍', emoji_name: 'Thumbs Up', id: 'thumbsup' },
+    { emoji: '😂', emoji_name: 'Face with Tears of Joy', id: 'laugh' },
+  ],
+  plusEnabled: true,
+});
+
+if (result.type === 'plus') {
+  const sheetResult = await EmojiSheetModule.present({ theme: 'dark' });
+  if (!sheetResult.cancelled) {
+    handleReaction(sheetResult.emoji);
+  }
+} else if (result.type === 'select') {
+  handleReaction(result.id);
+}
+```
+
 ## Key Behaviors
 
 - Frequently used emojis persist across app launches (UserDefaults on iOS, SharedPreferences on Android)
