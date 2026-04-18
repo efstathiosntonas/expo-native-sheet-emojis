@@ -357,7 +357,8 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
         dismissSkinTonePicker()
 
         guard let cell = collectionView.cellForItem(at: indexPath) else { return }
-        let cellFrameInSelf = collectionView.convert(cell.frame, to: self)
+        let targetView = superview ?? self
+        let cellFrameInTarget = collectionView.convert(cell.frame, to: targetView)
 
         if enableHaptics {
             impactFeedbackMedium.impactOccurred()
@@ -381,19 +382,19 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
             self.dismissSkinTonePicker()
         }
 
-        addSubview(picker)
+        targetView.addSubview(picker)
         picker.translatesAutoresizingMaskIntoConstraints = false
 
         let pickerWidth: CGFloat = 6 * 48 + 16
         let pickerHeight: CGFloat = 56
 
-        var centerX = cellFrameInSelf.midX
+        var centerX = cellFrameInTarget.midX
         let halfWidth = pickerWidth / 2
-        centerX = max(halfWidth + 4, min(bounds.width - halfWidth - 4, centerX))
+        centerX = max(halfWidth + 8, min(targetView.bounds.width - halfWidth - 8, centerX))
 
         NSLayoutConstraint.activate([
-            picker.centerXAnchor.constraint(equalTo: leadingAnchor, constant: centerX),
-            picker.bottomAnchor.constraint(equalTo: topAnchor, constant: cellFrameInSelf.minY - 4),
+            picker.centerXAnchor.constraint(equalTo: targetView.leftAnchor, constant: centerX),
+            picker.bottomAnchor.constraint(equalTo: targetView.topAnchor, constant: cellFrameInTarget.minY - 4),
             picker.widthAnchor.constraint(equalToConstant: pickerWidth),
             picker.heightAnchor.constraint(equalToConstant: pickerHeight),
         ])
