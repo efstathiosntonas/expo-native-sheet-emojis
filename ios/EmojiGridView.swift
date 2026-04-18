@@ -390,10 +390,10 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
 
         var centerX = cellFrameInTarget.midX
         let halfWidth = pickerWidth / 2
-        centerX = max(halfWidth + 4, min(targetView.bounds.width - halfWidth - 4, centerX))
+        centerX = max(halfWidth + 8, min(targetView.bounds.width - halfWidth - 8, centerX))
 
         NSLayoutConstraint.activate([
-            picker.centerXAnchor.constraint(equalTo: targetView.leadingAnchor, constant: centerX),
+            picker.centerXAnchor.constraint(equalTo: targetView.leftAnchor, constant: centerX),
             picker.bottomAnchor.constraint(equalTo: targetView.topAnchor, constant: cellFrameInTarget.minY - 4),
             picker.widthAnchor.constraint(equalToConstant: pickerWidth),
             picker.heightAnchor.constraint(equalToConstant: pickerHeight),

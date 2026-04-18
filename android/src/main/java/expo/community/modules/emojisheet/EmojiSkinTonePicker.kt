@@ -111,12 +111,16 @@ class EmojiSkinTonePicker(
             }
         }
 
-        // Position above anchor
-        val location = IntArray(2)
-        anchorView.getLocationOnScreen(location)
-        val xOff = -(totalWidth / 2) + (anchorView.width / 2)
-        val yOff = -totalHeight - (4 * density).toInt()
+        // Use window-relative coordinates to avoid RTL xOff flip and status bar offset
+        val anchorLocation = IntArray(2)
+        anchorView.getLocationInWindow(anchorLocation)
+        val windowWidth = anchorView.rootView.width
+        val edgePadding = (8 * density).toInt()
 
-        popup.showAsDropDown(anchorView, xOff, yOff)
+        val idealLeft = anchorLocation[0] + anchorView.width / 2 - totalWidth / 2
+        val clampedLeft = idealLeft.coerceIn(edgePadding, windowWidth - totalWidth - edgePadding)
+        val popupTop = anchorLocation[1] - totalHeight - (4 * density).toInt()
+
+        popup.showAtLocation(anchorView.rootView, Gravity.NO_GRAVITY, clampedLeft, popupTop)
     }
 }
