@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.0.2](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v2.0.1...v2.0.2) (2026-04-18)
+
+### Bug Fixes
+
+* skin tone picker positioning on iOS and Android (RTL + z-index) ([#21](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/21)) ([02d1528](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/02d15282adc8a52b7bf0572dd2131e5822d2352e))
+
+### Documentation
+
+* add expo-native-emojis-popup integration guide to README and llms.txt ([12b2c40](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/12b2c40bfe686ec35bf24da092eea171210fb7ff))
+* remove redundant Related Projects section ([70229a4](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/70229a4e55678e9072e2517fcd2c0b7b9d46149b))
+* removed redundant 60FPS ([1f27df1](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/1f27df14368b281c75e42646e3aa22021bfc5571))
+
+### Chores
+
+* removed email from package.json ([600b17b](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/600b17bde99d170c2daf54ab8681f8fef6f5352c))
+
 ## [2.0.1](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v2.0.0...v2.0.1) (2026-03-23)
 
 ### Chores
