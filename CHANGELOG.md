@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.3](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v2.0.2...v2.0.3) (2026-04-29)
+
+### Bug Fixes
+
+* prevent duplicate emoji sheet presentations and resolve stale overlay window ([#22](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/22)) ([a2a43bc](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/a2a43bc7f2c4d320176df64ae2da562e5b1f0015))
+* prevent RTL category bar flicker on iOS ([8ff1a9f](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/8ff1a9f132d95c09e1835cbf5dce577c9c4a777b))
+* set explicit height for embedded container example ([a28fd6e](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/a28fd6ea3cc9ffa859a83c2e1075d5403e53d563))
+
 ## [2.0.2](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v2.0.1...v2.0.2) (2026-04-18)
 
 ### Bug Fixes
