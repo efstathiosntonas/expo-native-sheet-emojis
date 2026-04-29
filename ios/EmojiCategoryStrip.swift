@@ -72,36 +72,62 @@ class EmojiCategoryStrip: UIView, UICollectionViewDataSource, UICollectionViewDe
     func updateCategories(_ keys: [String]) {
         categoryKeys = keys
         selectedIndex = 0
-        collectionView.reloadData()
+        reloadCategories()
     }
 
     func applyTheme(_ theme: EmojiSheetTheme) {
         currentTheme = theme
         backgroundColor = theme.categoryBarBackgroundColor
         dividerLine.backgroundColor = theme.dividerColor
-        collectionView.reloadData()
+        reloadCategories()
     }
 
     func applyLayoutDirection(_ attribute: UISemanticContentAttribute) {
-        semanticContentAttribute = attribute
-        collectionView.semanticContentAttribute = attribute
-        collectionView.collectionViewLayout.invalidateLayout()
+        UIView.performWithoutAnimation {
+            semanticContentAttribute = attribute
+            collectionView.semanticContentAttribute = attribute
+            collectionView.collectionViewLayout.invalidateLayout()
+            collectionView.layoutIfNeeded()
+        }
     }
 
     func selectCategory(at index: Int) {
         guard !isSearchActive, index != selectedIndex, index >= 0, index < categoryKeys.count else { return }
         selectedIndex = index
-        collectionView.reloadData()
-        collectionView.scrollToItem(
-            at: IndexPath(item: index, section: 0),
-            at: .centeredHorizontally,
-            animated: true
-        )
+        reloadCategories()
+        scrollToCategoryIfNeeded(at: index)
     }
 
     func setSearchActive(_ active: Bool) {
         isSearchActive = active
-        collectionView.reloadData()
+        reloadCategories()
+    }
+
+    private func reloadCategories() {
+        UIView.performWithoutAnimation {
+            collectionView.reloadData()
+            collectionView.layoutIfNeeded()
+        }
+    }
+
+    private func scrollToCategoryIfNeeded(at index: Int) {
+        guard index >= 0, index < categoryKeys.count else { return }
+
+        let indexPath = IndexPath(item: index, section: 0)
+        guard let attributes = collectionView.layoutAttributesForItem(at: indexPath) else {
+            return
+        }
+
+        let visibleBounds = CGRect(origin: collectionView.contentOffset, size: collectionView.bounds.size)
+        guard !visibleBounds.contains(attributes.frame) else {
+            return
+        }
+
+        collectionView.scrollToItem(
+            at: indexPath,
+            at: .centeredHorizontally,
+            animated: false
+        )
     }
 
     // MARK: - UICollectionViewDataSource
@@ -134,7 +160,7 @@ class EmojiCategoryStrip: UIView, UICollectionViewDataSource, UICollectionViewDe
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedIndex = indexPath.item
         isSearchActive = false
-        collectionView.reloadData()
+        reloadCategories()
         delegate?.categoryStrip(self, didSelectCategoryAt: indexPath.item)
     }
 }
