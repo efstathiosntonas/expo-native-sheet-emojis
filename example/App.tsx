@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   embeddedContainer: {
-    flex: 1,
+    height: 520,
     width: '100%',
     marginTop: 16,
   },
