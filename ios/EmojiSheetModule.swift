@@ -96,6 +96,15 @@ public class EmojiSheetModule: Module {
     // MARK: - Presentation via dedicated UIWindow
 
     private func presentSheet(options: [String: Any], promise: Promise) {
+        guard currentPromise == nil, sheetViewController == nil else {
+            promise.resolve(["cancelled": true])
+            return
+        }
+
+        if overlayWindow != nil {
+            tearDownWindow()
+        }
+
         guard let windowScene = UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
             .first(where: { $0.activationState == .foregroundActive })
