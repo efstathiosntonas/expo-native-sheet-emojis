@@ -120,7 +120,11 @@ class EmojiGridView: UIView, UICollectionViewDataSource, UICollectionViewDelegat
     func updateSections(_ newSections: [EmojiSection], categoryNames: [String: String]) {
         self.sections = newSections
         self.categoryNames = categoryNames
-        collectionView.reloadData()
+        UIView.performWithoutAnimation {
+            collectionView.collectionViewLayout.invalidateLayout()
+            collectionView.reloadData()
+            collectionView.layoutIfNeeded()
+        }
     }
 
     func applyTheme(_ theme: EmojiSheetTheme) {

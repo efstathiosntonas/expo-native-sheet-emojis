@@ -10,6 +10,9 @@ struct EmojiItem: Sendable {
     let toneEnabled: Bool
     let keywords: [String]
     let id: String
+    let normalizedName: String
+    let normalizedNameVariants: [String]
+    let normalizedKeywords: [String]
 }
 
 struct EmojiSection: Sendable {
