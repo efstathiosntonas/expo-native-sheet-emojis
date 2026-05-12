@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.0.4](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v2.0.2...v2.0.4) (2026-05-12)
+
+### Bug Fixes
+
+* align emoji sheet keyboard and snap behavior ([#24](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/24)) ([ba815d1](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/ba815d125d164de0613cf5e1a063da9f469cd134))
+* prevent duplicate emoji sheet presentations and resolve stale overlay window ([#22](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/22)) ([a2a43bc](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/a2a43bc7f2c4d320176df64ae2da562e5b1f0015))
+* prevent RTL category bar flicker on iOS ([#23](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/23)) ([02058b2](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/02058b22c03b65331c4364d8032556308e3bce5a))
+* set explicit height for embedded container example ([a28fd6e](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/a28fd6ea3cc9ffa859a83c2e1075d5403e53d563))
+
+## [2.0.3](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v2.0.2...v2.0.3) (2026-05-12)
+
+### Bug Fixes
+
+* align emoji sheet keyboard and snap behavior ([#24](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/24)) ([ba815d1](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/ba815d125d164de0613cf5e1a063da9f469cd134))
+* prevent duplicate emoji sheet presentations and resolve stale overlay window ([#22](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/22)) ([a2a43bc](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/a2a43bc7f2c4d320176df64ae2da562e5b1f0015))
+* prevent RTL category bar flicker on iOS ([#23](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/23)) ([02058b2](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/02058b22c03b65331c4364d8032556308e3bce5a))
+* set explicit height for embedded container example ([a28fd6e](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/a28fd6ea3cc9ffa859a83c2e1075d5403e53d563))
+
 ## [2.0.2](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v2.0.1...v2.0.2) (2026-04-18)
 
 ### Bug Fixes
