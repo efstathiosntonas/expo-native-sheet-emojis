@@ -10,6 +10,8 @@ import android.view.VelocityTracker
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
@@ -23,8 +25,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import java.text.Normalizer
-import java.util.Locale
 
 class EmojiSheetUIView(context: Context) : LinearLayout(context) {
 
@@ -33,7 +33,6 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         private const val FREQ_COUNT_SUFFIX = "_count"
         private const val FREQ_DAY_SUFFIX = "_day"
         private const val FREQ_TIME_SUFFIX = "_time"
-        private val COMBINING_MARKS_REGEX = "\\p{Mn}+".toRegex()
         private val cacheScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
         private val cacheMutex = Mutex()
         @Volatile
@@ -75,14 +74,17 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
                         val arr = obj.getJSONArray(key)
                         val keywords = merged.getOrPut(key) { mutableListOf() }
                         for (i in 0 until arr.length()) {
-                            keywords.add(arr.getString(i))
+                            val normalizedKeyword = EmojiData.normalizeSearchText(arr.getString(i))
+                            if (normalizedKeyword.isNotBlank()) {
+                                keywords.add(normalizedKeyword)
+                            }
                         }
                     }
                 }
             } catch (e: Exception) {
                 // Fallback or empty
             }
-            return merged
+            return merged.mapValues { it.value.distinct() }
         }
     }
 
@@ -114,6 +116,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
     private var currentTheme = EmojiSheetTheme.light
     private var allCategories: List<EmojiCategory> = emptyList()
     private var allCategoryKeys: List<String> = emptyList()
+    // Values are normalized once at load time so search scoring only compares strings.
     private var localizedKeywords: Map<String, List<String>> = emptyMap()
 
     private val searchBar: EmojiSearchBar
@@ -139,6 +142,10 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
     private var velocityTracker: VelocityTracker? = null
     private var topPullStartY: Float? = null
     private val topPullActivationThresholdPx = 24f * context.resources.displayMetrics.density
+    private val keyboardResultBottomGapPx = (16f * context.resources.displayMetrics.density).toInt()
+    private var baseRecyclerBottomPadding = 0
+    private var keyboardRecyclerBottomPadding = 0
+    private var usesDockedSheetKeyboardInsets = false
     private val viewScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private var loadJob: Job? = null
     private var searchJob: Job? = null
@@ -238,7 +245,12 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
 
                         val deltaY = e.y - initialTouchY
                         val isAtTop = !rv.canScrollVertically(-1)
-                        if (!isSheetExpanded && deltaY < -touchSlop && !didTriggerExpandForCurrentDrag) {
+                        if (
+                            !isSheetExpanded &&
+                            onScrollIntentUp != null &&
+                            deltaY < -touchSlop &&
+                            !didTriggerExpandForCurrentDrag
+                        ) {
                             didTriggerExpandForCurrentDrag = true
                             isSheetExpansionInProgress = true
                             rv.stopScroll()
@@ -284,7 +296,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
             }
 
             override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
-                if (!isSheetExpanded) {
+                if (!isSheetExpanded && onScrollIntentUp != null) {
                     rv.stopScroll()
                     return
                 }
@@ -330,6 +342,14 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         }
         addView(contentFrame)
 
+        ViewCompat.setOnApplyWindowInsetsListener(this) { _, insets ->
+            setKeyboardBottomInset(
+                imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom,
+                navigationBottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            )
+            insets
+        }
+
         applyTheme(currentTheme)
         applyLayoutDirection()
     }
@@ -346,6 +366,28 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         if (inProgress) {
             recyclerView.stopScroll()
         }
+    }
+
+    fun setKeyboardBottomInset(imeBottom: Int, navigationBottom: Int) {
+        if (usesDockedSheetKeyboardInsets) return
+
+        val keyboardOnlyBottom = maxOf(0, imeBottom - navigationBottom)
+        setKeyboardRecyclerBottomPadding(
+            if (keyboardOnlyBottom > 0) keyboardOnlyBottom + keyboardResultBottomGapPx else 0
+        )
+    }
+
+    fun setKeyboardDockedToSheet(keyboardVisible: Boolean) {
+        usesDockedSheetKeyboardInsets = true
+        setKeyboardRecyclerBottomPadding(
+            if (keyboardVisible) keyboardResultBottomGapPx else 0
+        )
+    }
+
+    private fun setKeyboardRecyclerBottomPadding(bottomPadding: Int) {
+        if (keyboardRecyclerBottomPadding == bottomPadding) return
+        keyboardRecyclerBottomPadding = bottomPadding
+        updateRecyclerBottomPadding()
     }
 
     /** Call after setting configurable properties but before loadDataAsync to apply layout changes. */
@@ -419,16 +461,30 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
 
             // Bottom padding so grid content scrolls above the floating bar
             val totalBarSpace = stripHeight + bottomInset * 2
-            recyclerView.setPadding(
-                recyclerView.paddingLeft,
-                recyclerView.paddingTop,
-                recyclerView.paddingRight,
-                totalBarSpace
-            )
-            recyclerView.clipToPadding = false
+            baseRecyclerBottomPadding = totalBarSpace
+            updateRecyclerBottomPadding()
 
             addView(wrapperFrame)
+        } else {
+            baseRecyclerBottomPadding = 0
+            updateRecyclerBottomPadding()
         }
+    }
+
+    private fun setGridItems(items: List<EmojiGridAdapter.ListItem>, sectionPositions: List<Int>) {
+        gridAdapter.setItems(items, sectionPositions)
+        stickyHeaderDecoration.invalidateCache()
+        recyclerView.invalidateItemDecorations()
+    }
+
+    private fun updateRecyclerBottomPadding() {
+        recyclerView.setPadding(
+            recyclerView.paddingLeft,
+            recyclerView.paddingTop,
+            recyclerView.paddingRight,
+            baseRecyclerBottomPadding + keyboardRecyclerBottomPadding
+        )
+        recyclerView.clipToPadding = false
     }
 
     var searchPlaceholder: String? = null
@@ -549,8 +605,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
             }
         }
 
-        gridAdapter.setItems(items, sectionPositions)
-        stickyHeaderDecoration.invalidateCache()
+        setGridItems(items, sectionPositions)
 
         // Rebuild category keys in case frequently_used changed
         val newKeys = buildCategoryKeys()
@@ -625,6 +680,10 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         isSearchActive = true
         categoryStrip.visibility = View.GONE
         bottomPillContainer?.visibility = View.GONE
+        emptyStateLabel.visibility = View.GONE
+        recyclerView.visibility = View.VISIBLE
+        setGridItems(emptyList(), emptyList())
+        recyclerView.scrollToPosition(0)
 
         val generation = ++searchGeneration
         val categories = allCategories
@@ -633,7 +692,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         val exclude = excludeEmojis
         searchJob = viewScope.launch {
             val matchedItems = withContext(Dispatchers.Default) {
-                val normalizedQueryVariants = normalizedSearchVariants(trimmedQuery)
+                val normalizedQueryVariants = EmojiData.normalizedSearchVariants(trimmedQuery)
                 val scored = mutableListOf<Pair<EmojiGridAdapter.ListItem.Emoji, Int>>()
 
                 for (cat in categories) {
@@ -671,7 +730,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
 
             emptyStateLabel.visibility = if (matchedItems.isNotEmpty()) View.GONE else View.VISIBLE
             recyclerView.visibility = if (matchedItems.isNotEmpty()) View.VISIBLE else View.GONE
-            gridAdapter.setItems(results, sectionPositions)
+            setGridItems(results, sectionPositions)
             recyclerView.scrollToPosition(0)
         }
     }
@@ -782,22 +841,6 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         return emoji.filter { it.code != 0xFE0E && it.code != 0xFE0F }
     }
 
-    private fun normalizeSearchText(text: String): String {
-        val normalized = Normalizer.normalize(text, Normalizer.Form.NFD)
-            .replace(COMBINING_MARKS_REGEX, "")
-        return normalized
-            .trim()
-            .lowercase(Locale.ROOT)
-    }
-
-    private fun normalizedSearchVariants(text: String): Set<String> {
-        return setOf(normalizeSearchText(text)).filter { it.isNotBlank() }.toSet()
-    }
-
-    private fun matchesSearch(normalizedText: String, queryVariants: Set<String>): Boolean {
-        return queryVariants.any { normalizedText.contains(it) }
-    }
-
     // Relevance scoring for search results:
     // 100 = exact name match, 90 = name starts with, 80 = exact keyword,
     // 70 = keyword starts with, 50 = name contains, 30 = keyword contains,
@@ -807,18 +850,15 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         queryVariants: Set<String>,
         localizedKeywords: Map<String, List<String>>
     ): Int {
-        val nameNorm = normalizeSearchText(emoji.name)
-
         // Check name
         for (variant in queryVariants) {
-            if (nameNorm == variant) return 100
-            if (nameNorm.startsWith(variant)) return 90
+            if (emoji.normalizedName == variant) return 100
+            if (emoji.normalizedName.startsWith(variant)) return 90
         }
 
         // Check built-in keywords
         var bestScore = 0
-        for (kw in emoji.keywords) {
-            val kwNorm = normalizeSearchText(kw)
+        for (kwNorm in emoji.normalizedKeywords) {
             for (variant in queryVariants) {
                 if (kwNorm == variant) bestScore = maxOf(bestScore, 80)
                 else if (kwNorm.startsWith(variant)) bestScore = maxOf(bestScore, 70)
@@ -830,7 +870,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         // Check name contains (lower priority than keyword exact/startsWith)
         if (bestScore < 50) {
             for (variant in queryVariants) {
-                if (nameNorm.contains(variant)) bestScore = maxOf(bestScore, 50)
+                if (emoji.normalizedName.contains(variant)) bestScore = maxOf(bestScore, 50)
             }
         }
 
@@ -841,7 +881,7 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
             ?: localizedKeywords[stripVariationSelectors(emoji.emoji)]
         if (localKw != null) {
             for (kw in localKw) {
-                if (queryVariants.any { normalizeSearchText(kw).contains(it) }) return 10
+                if (queryVariants.any { kw.contains(it) }) return 10
             }
         }
 
@@ -862,5 +902,10 @@ class EmojiSheetUIView(context: Context) : LinearLayout(context) {
         loadJob?.cancel()
         searchJob?.cancel()
         viewScope.cancel()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        ViewCompat.requestApplyInsets(this)
     }
 }
