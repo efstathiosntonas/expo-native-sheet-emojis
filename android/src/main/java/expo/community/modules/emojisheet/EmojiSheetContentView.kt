@@ -19,6 +19,7 @@ class EmojiSheetContentView(
 
     init {
         pickerView.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+        pickerView.setSheetExpanded(true)
         pickerView.onEmojiSelected = { data ->
             onEmojiSelected(data)
         }

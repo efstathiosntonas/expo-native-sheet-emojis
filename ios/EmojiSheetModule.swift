@@ -217,7 +217,10 @@ public class EmojiSheetModule: Module {
             sheetBackgroundColor: bgColor,
             theme: customTheme
         )
-        sheetVC.mediumDetentRatio = CGFloat(snapPoints.first ?? 0.5)
+        let mediumRatio = min(max(CGFloat(snapPoints.first ?? 0.5), 0.05), 1)
+        let largeRatio = min(max(CGFloat(snapPoints.dropFirst().first ?? 1.0), mediumRatio), 1)
+        sheetVC.mediumDetentRatio = mediumRatio
+        sheetVC.largeDetentRatio = largeRatio
         sheetVC.gestureEnabled = gestureEnabled
         sheetVC.embedPickerView(pickerView)
         sheetVC.onAppear = { [weak self] in
@@ -329,6 +332,7 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
     var onAppear: (() -> Void)?
     var onDismiss: (() -> Void)?
     var mediumDetentRatio: CGFloat = 0.5
+    var largeDetentRatio: CGFloat = 1.0
     var gestureEnabled: Bool = true
 
     private let backdropView = UIView()
@@ -387,7 +391,7 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
             options: [.curveEaseOut]
         ) {
             self.backdropView.alpha = Layout.backdropAlpha
-            self.sheetContainerView.transform = self.transform(for: self.currentDetent)
+            self.applyDetentLayout(self.currentDetent)
         } completion: { [weak self] _ in
             self?.onAppear?()
         }
@@ -404,7 +408,7 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
         }
 
         guard hasPresented, !isAnimatingDismissal else { return }
-        sheetContainerView.transform = transform(for: currentDetent)
+        applyDetentLayout(currentDetent)
     }
 
     func embedPickerView(_ embeddedView: UIView) {
@@ -454,8 +458,9 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
         currentDetent = detent
 
         let updates = {
-            self.sheetContainerView.transform = self.transform(for: detent)
+            self.applyDetentLayout(detent)
             self.backdropView.alpha = Layout.backdropAlpha
+            self.view.layoutIfNeeded()
         }
 
         if animated {
@@ -497,12 +502,13 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
             .union(.beginFromCurrentState)
 
         let overlap = keyboardOverlap(for: endFrame)
+        let wasKeyboardVisible = keyboardOverlap > 0
         let targetDetent: Detent
 
-        if overlap > 0, isSearchFocused {
+        if wasKeyboardVisible, overlap == 0 {
+            targetDetent = .medium
+        } else if overlap > 0, isSearchFocused {
             targetDetent = .large
-        } else if overlap == 0, !isSearchFocused, let previousDetent = detentBeforeSearchFocus {
-            targetDetent = previousDetent
         } else {
             targetDetent = currentDetent
         }
@@ -513,13 +519,13 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
             options: animationOptions
         ) {
             self.keyboardOverlap = overlap
-            self.sheetBottomConstraint?.constant = -overlap
-            self.sheetContainerView.transform = self.transform(for: targetDetent)
+            self.applyDetentLayout(targetDetent, keyboardOverlap: overlap)
             self.backdropView.alpha = Layout.backdropAlpha
             self.view.layoutIfNeeded()
         } completion: { _ in
             self.currentDetent = targetDetent
-            if overlap == 0, !self.isSearchFocused {
+            if overlap == 0 {
+                self.isSearchFocused = false
                 self.detentBeforeSearchFocus = nil
             }
         }
@@ -552,6 +558,8 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
 
     private func updateSheetDrag(_ distance: CGFloat) {
         guard !isAnimatingDismissal, currentDetent == .large else { return }
+        dismissKeyboardForSheetDrag()
+
         let adjustedDistance = max(0, distance * 0.7)
         sheetContainerView.layer.removeAllAnimations()
         sheetContainerView.transform = CGAffineTransform(translationX: 0, y: adjustedDistance)
@@ -579,8 +587,9 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
             initialSpringVelocity: 0.1,
             options: [.curveEaseOut]
         ) {
-            self.sheetContainerView.transform = self.transform(for: .large)
+            self.applyDetentLayout(.large)
             self.backdropView.alpha = Layout.backdropAlpha
+            self.view.layoutIfNeeded()
         }
     }
 
@@ -692,6 +701,9 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
 
         switch gesture.state {
         case .changed:
+            if gesture.translation(in: view).y > 0 {
+                dismissKeyboardForSheetDrag()
+            }
             sheetContainerView.transform = CGAffineTransform(translationX: 0, y: translationY)
             backdropView.alpha = Layout.backdropAlpha * (1 - dismissProgress)
         case .ended, .cancelled:
@@ -727,29 +739,61 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
         }
     }
 
+    private func dismissKeyboardForSheetDrag() {
+        view.endEditing(true)
+    }
+
     private var dismissalTranslation: CGFloat {
         sheetContainerView.bounds.height + view.safeAreaInsets.bottom + 24
     }
 
-    private func transform(for detent: Detent) -> CGAffineTransform {
-        CGAffineTransform(translationX: 0, y: translation(for: detent))
+    private func applyDetentLayout(_ detent: Detent, keyboardOverlap overlap: CGFloat? = nil) {
+        let overlap = overlap ?? keyboardOverlap
+        sheetBottomConstraint?.constant = bottomConstraintConstant(for: detent, keyboardOverlap: overlap)
+        sheetContainerView.transform = transform(for: detent, keyboardOverlap: overlap)
+    }
+
+    private func transform(for detent: Detent, keyboardOverlap overlap: CGFloat? = nil) -> CGAffineTransform {
+        CGAffineTransform(translationX: 0, y: translation(for: detent, keyboardOverlap: overlap))
     }
 
     private func transformForDismissal() -> CGAffineTransform {
         CGAffineTransform(translationX: 0, y: dismissalTranslation)
     }
 
-    private func translation(for detent: Detent) -> CGFloat {
+    private func bottomConstraintConstant(for detent: Detent, keyboardOverlap overlap: CGFloat? = nil) -> CGFloat {
+        let overlap = overlap ?? keyboardOverlap
+        guard overlap > 0 else { return 0 }
+        return -overlap - translation(for: detent, keyboardOverlap: overlap)
+    }
+
+    private func translation(for detent: Detent, keyboardOverlap overlap: CGFloat? = nil) -> CGFloat {
+        let fullHeight = max(0, view.bounds.height - view.safeAreaInsets.top - Layout.sheetTopInset)
+        let availableHeight = max(0, fullHeight - (overlap ?? keyboardOverlap))
+        let visibleHeight = visibleHeight(for: detent, availableHeight: availableHeight, fullHeight: fullHeight)
+        return max(0, availableHeight - visibleHeight)
+    }
+
+    private func visibleHeight(for detent: Detent, availableHeight: CGFloat, fullHeight: CGFloat) -> CGFloat {
         switch detent {
         case .large:
-            return 0
-        case .medium:
-            let containerHeight = max(sheetContainerView.bounds.height, 0)
-            let visibleHeight = max(
+            let mediumVisibleHeight = max(
                 Layout.minimumMediumVisibleHeight,
-                containerHeight * mediumDetentRatio
+                fullHeight * mediumDetentRatio
             )
-            return max(0, containerHeight - min(visibleHeight, containerHeight))
+            return min(
+                availableHeight,
+                max(mediumVisibleHeight, fullHeight * largeDetentRatio)
+            )
+        case .medium:
+            let visibleHeight = min(
+                availableHeight,
+                max(
+                    Layout.minimumMediumVisibleHeight,
+                    fullHeight * mediumDetentRatio
+                )
+            )
+            return max(0, visibleHeight)
         }
     }
 }

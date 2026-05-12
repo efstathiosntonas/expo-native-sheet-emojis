@@ -91,6 +91,7 @@ class EmojiSheetUIView: UIView,
         static let floatingBarHorizontalInset: CGFloat = 16
         static let floatingBarBottomInset: CGFloat = 8
         static let floatingBarCornerRadius: CGFloat = 22
+        static let keyboardBottomSpacing: CGFloat = 16
     }
 
     weak var delegate: EmojiSheetUIViewDelegate?
@@ -141,6 +142,7 @@ class EmojiSheetUIView: UIView,
     private var allSections: [EmojiSection] = []
     private var filteredSections: [EmojiSection] = []
     private var frequentlyUsedSection: EmojiSection?
+    // Values are normalized once at load time so search scoring only compares strings.
     private var localizedKeywords: [String: [String]] = [:]
     private var currentSearchText: String?
     private var loadTask: Task<Void, Never>?
@@ -148,6 +150,8 @@ class EmojiSheetUIView: UIView,
     // Search work is cancellable. The generation counter remains as a lightweight
     // secondary guard so stale results never apply after a newer query wins.
     private var searchGeneration: Int = 0
+    private var baseGridBottomInset: CGFloat = 0
+    private var keyboardGridBottomInset: CGFloat = 0
 
     private let searchBar = EmojiSearchBar()
     private let categoryStrip = EmojiCategoryStrip()
@@ -181,6 +185,7 @@ class EmojiSheetUIView: UIView,
         "symbols": "Symbols",
         "flags": "Flags",
         "frequently_used": "Frequently Used",
+        "search_results": "Search Results",
     ]
 
     // MARK: - Init
@@ -197,6 +202,7 @@ class EmojiSheetUIView: UIView,
     deinit {
         loadTask?.cancel()
         searchTask?.cancel()
+        NotificationCenter.default.removeObserver(self)
     }
 
     // MARK: - Setup
@@ -221,6 +227,7 @@ class EmojiSheetUIView: UIView,
         categoryStrip.delegate = self
         gridView.delegate = self
 
+        registerKeyboardNotifications()
         configureLayout()
         applyLayoutDirection()
     }
@@ -353,7 +360,8 @@ class EmojiSheetUIView: UIView,
             // Bottom content inset so grid content scrolls above the floating bar
             let floatingBarTotalHeight = LayoutConstants.categoryStripHeight
                 + LayoutConstants.floatingBarBottomInset * 2
-            gridView.setBottomContentInset(floatingBarTotalHeight)
+            baseGridBottomInset = floatingBarTotalHeight
+            applyGridBottomInset()
 
         } else {
             // Top bar mode (default)
@@ -364,7 +372,8 @@ class EmojiSheetUIView: UIView,
                 categoryStrip.translatesAutoresizingMaskIntoConstraints = false
             }
 
-            gridView.setBottomContentInset(0)
+            baseGridBottomInset = 0
+            applyGridBottomInset()
 
             searchBarTopConstraint = searchBar.topAnchor.constraint(
                 equalTo: topAnchor, constant: LayoutConstants.searchBarTopSpacing)
@@ -397,6 +406,58 @@ class EmojiSheetUIView: UIView,
         }
 
         isLayoutConfigured = true
+    }
+
+    private func registerKeyboardNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillChangeFrame(_:)),
+            name: UIResponder.keyboardWillChangeFrameNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide(_:)),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+    }
+
+    @objc private func keyboardWillChangeFrame(_ notification: Notification) {
+        guard
+            window != nil,
+            let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
+        else { return }
+
+        let keyboardFrameInView = convert(keyboardFrame, from: nil)
+        let overlap = bounds.intersection(keyboardFrameInView).height
+        keyboardGridBottomInset = overlap > 0
+            ? max(0, overlap - safeAreaInsets.bottom) + LayoutConstants.keyboardBottomSpacing
+            : 0
+        applyGridBottomInset(animatedWith: notification)
+    }
+
+    @objc private func keyboardWillHide(_ notification: Notification) {
+        keyboardGridBottomInset = 0
+        applyGridBottomInset(animatedWith: notification)
+    }
+
+    private func applyGridBottomInset(animatedWith notification: Notification? = nil) {
+        let inset = baseGridBottomInset + keyboardGridBottomInset
+        guard
+            let notification,
+            let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval,
+            let curve = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? Int
+        else {
+            gridView.setBottomContentInset(inset)
+            return
+        }
+
+        let options = UIView.AnimationOptions(rawValue: UInt(curve << 16)).union(.beginFromCurrentState)
+        UIView.animate(withDuration: duration, delay: 0, options: options) {
+            self.gridView.setBottomContentInset(inset)
+            self.layoutIfNeeded()
+        }
     }
 
     // MARK: - Data Loading (cached across instances)
@@ -443,7 +504,7 @@ class EmojiSheetUIView: UIView,
             }
         }
 
-        return merged
+        return merged.mapValues { Array(Set($0)) }
     }
 
     nonisolated private static func mergeKeywords(from url: URL, into merged: inout [String: [String]]) {
@@ -451,11 +512,14 @@ class EmojiSheetUIView: UIView,
               let dict = try? JSONSerialization.jsonObject(with: data) as? [String: [String]]
         else { return }
         for (key, value) in dict {
+            let normalized = normalizedSearchKeywords(value)
+            guard !normalized.isEmpty else { continue }
+
             if var existing = merged[key] {
-                existing.append(contentsOf: value)
+                existing.append(contentsOf: normalized)
                 merged[key] = existing
             } else {
-                merged[key] = value
+                merged[key] = normalized
             }
         }
     }
@@ -525,7 +589,17 @@ class EmojiSheetUIView: UIView,
                 }
                 let emojiVersion = Double(v) ?? 0
                 guard emojiVersion <= maxVersion else { return nil }
-                return EmojiItem(emoji: emoji, name: name, version: v, toneEnabled: toneEnabled, keywords: keywords, id: id)
+                return EmojiItem(
+                    emoji: emoji,
+                    name: name,
+                    version: v,
+                    toneEnabled: toneEnabled,
+                    keywords: keywords,
+                    id: id,
+                    normalizedName: normalizeSearchText(name),
+                    normalizedNameVariants: normalizedSearchVariants(name),
+                    normalizedKeywords: normalizedSearchKeywords(keywords)
+                )
             }
             return EmojiSection(title: title, data: emojis)
         }
@@ -576,6 +650,12 @@ class EmojiSheetUIView: UIView,
         }
 
         categoryStrip.setSearchActive(true)
+        emptyStateLabel.isHidden = true
+        gridView.isHidden = false
+        filteredSections = []
+        gridView.updateSections([], categoryNames: mergedCategoryNames)
+        gridView.scrollToTop()
+
         searchGeneration += 1
         let generation = searchGeneration
         let sections = filteredAllSections
@@ -635,18 +715,15 @@ class EmojiSheetUIView: UIView,
         searchVariants: [String],
         localizedKeywords: [String: [String]]
     ) -> Int {
-        let nameNorm = normalizeSearchText(item.name)
-
         // Check name
         for variant in searchVariants {
-            if nameNorm == variant { return 100 }
-            if nameNorm.hasPrefix(variant) { return 90 }
+            if item.normalizedName == variant { return 100 }
+            if item.normalizedName.hasPrefix(variant) { return 90 }
         }
 
         // Check built-in keywords
         var bestScore = 0
-        for kw in item.keywords {
-            let kwNorm = normalizeSearchText(kw)
+        for kwNorm in item.normalizedKeywords {
             for variant in searchVariants {
                 if kwNorm == variant { bestScore = max(bestScore, 80) }
                 else if kwNorm.hasPrefix(variant) { bestScore = max(bestScore, 70) }
@@ -658,7 +735,7 @@ class EmojiSheetUIView: UIView,
         // Check name contains (lower priority than keyword exact/startsWith)
         if bestScore < 50 {
             for variant in searchVariants {
-                if nameNorm.contains(variant) { bestScore = max(bestScore, 50) }
+                if item.normalizedName.contains(variant) { bestScore = max(bestScore, 50) }
             }
         }
 
@@ -666,14 +743,12 @@ class EmojiSheetUIView: UIView,
 
         // Check localized keywords
         let localKw = Self.localizedKeywordsForEmoji(item.emoji, in: localizedKeywords)
-        for kw in localKw {
-            let kwNorm = normalizeSearchText(kw)
+        for kwNorm in localKw {
             if searchVariants.contains(where: { kwNorm.contains($0) }) { return 10 }
         }
 
         // Transliteration fallback for non-Latin scripts
-        let nameVariants = normalizedSearchVariants(item.name)
-        for nameVariant in nameVariants where nameVariant != nameNorm {
+        for nameVariant in item.normalizedNameVariants where nameVariant != item.normalizedName {
             if searchVariants.contains(where: { nameVariant.contains($0) }) { return 5 }
         }
 
@@ -753,6 +828,16 @@ class EmojiSheetUIView: UIView,
             Set(
                 [normalized, transliterated]
                     .compactMap { $0 }
+                    .filter { !$0.isEmpty }
+            )
+        )
+    }
+
+    nonisolated private static func normalizedSearchKeywords(_ keywords: [String]) -> [String] {
+        Array(
+            Set(
+                keywords
+                    .map(normalizeSearchText)
                     .filter { !$0.isEmpty }
             )
         )

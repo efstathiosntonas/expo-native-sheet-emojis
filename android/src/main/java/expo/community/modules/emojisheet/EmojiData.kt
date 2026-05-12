@@ -3,6 +3,8 @@ package expo.community.modules.emojisheet
 import android.content.Context
 import android.os.Build
 import org.json.JSONArray
+import java.text.Normalizer
+import java.util.Locale
 
 data class EmojiItem(
     val emoji: String,
@@ -10,7 +12,9 @@ data class EmojiItem(
     val v: String,
     val toneEnabled: Boolean,
     val keywords: List<String>,
-    val id: String
+    val id: String,
+    val normalizedName: String,
+    val normalizedKeywords: List<String>
 )
 
 data class EmojiCategory(
@@ -19,6 +23,8 @@ data class EmojiCategory(
 )
 
 object EmojiData {
+
+    private val COMBINING_MARKS_REGEX = "\\p{Mn}+".toRegex()
 
     val categoryDisplayNames = mapOf(
         "frequently_used" to "Frequently Used",
@@ -53,14 +59,17 @@ object EmojiData {
                 for (k in 0 until keywordsArray.length()) {
                     keywords.add(keywordsArray.getString(k))
                 }
+                val name = item.getString("name")
                 items.add(
                     EmojiItem(
                         emoji = item.getString("emoji"),
-                        name = item.getString("name"),
+                        name = name,
                         v = item.getString("v"),
                         toneEnabled = item.getBoolean("toneEnabled"),
                         keywords = keywords,
-                        id = item.getString("id")
+                        id = item.getString("id"),
+                        normalizedName = normalizeSearchText(name),
+                        normalizedKeywords = normalizedSearchKeywords(keywords)
                     )
                 )
             }
@@ -82,6 +91,27 @@ object EmojiData {
             Build.VERSION.SDK_INT >= 28 -> 11.0
             else -> 11.0
         }
+    }
+
+    fun normalizeSearchText(text: String): String {
+        val normalized = Normalizer.normalize(text, Normalizer.Form.NFD)
+            .replace(COMBINING_MARKS_REGEX, "")
+        return normalized
+            .trim()
+            .lowercase(Locale.ROOT)
+    }
+
+    fun normalizedSearchVariants(text: String): Set<String> {
+        return setOf(normalizeSearchText(text)).filter { it.isNotBlank() }.toSet()
+    }
+
+    fun normalizedSearchKeywords(keywords: List<String>): List<String> {
+        return keywords
+            .asSequence()
+            .map(::normalizeSearchText)
+            .filter { it.isNotBlank() }
+            .distinct()
+            .toList()
     }
 
     fun displayName(categoryTitle: String, customNames: Map<String, String>? = null): String {

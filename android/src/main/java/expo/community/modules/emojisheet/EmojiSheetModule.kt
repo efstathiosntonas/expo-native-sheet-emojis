@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -241,6 +242,7 @@ class EmojiSheetModule : Module() {
             }
         }
         pickerView.onPullDownAtTopDrag = { distance ->
+            dismissKeyboard()
             updateSheetDrag(bottomSheet, distance)
         }
         pickerView.onPullDownAtTopRelease = { distance, velocity ->
@@ -263,7 +265,11 @@ class EmojiSheetModule : Module() {
         }
 
         // Container
-        val halfExpandedRatio = snapPoints.firstOrNull()?.toFloat() ?: 0.55f
+        val halfExpandedRatio = (snapPoints.firstOrNull()?.toFloat() ?: 0.5f).coerceIn(0.05f, 1f)
+        val expandedRatio = maxOf(
+            halfExpandedRatio,
+            (snapPoints.getOrNull(1)?.toFloat() ?: 1f).coerceIn(0.05f, 1f)
+        )
         val minSheetHeight = (activity.resources.displayMetrics.heightPixels * halfExpandedRatio).toInt()
         val cornerRadius = 16 * density
         val container = LinearLayout(activity).apply {
@@ -288,16 +294,41 @@ class EmojiSheetModule : Module() {
 
         bottomSheet.setContentView(container)
 
-        ViewCompat.setOnApplyWindowInsetsListener(container) { view, insets ->
+        var wasKeyboardVisible = false
+        val applyDialogInsets: (WindowInsetsCompat) -> Unit = { insets ->
             val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
             val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(
+            val navigationInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            val keyboardVisible = imeInsets.bottom > navigationInsets.bottom
+            container.setPadding(
                 systemBarInsets.left,
                 0,
                 systemBarInsets.right,
-                maxOf(imeInsets.bottom, systemBarInsets.bottom)
+                if (keyboardVisible) 0 else systemBarInsets.bottom
             )
-            WindowInsetsCompat.CONSUMED
+            updateSheetForKeyboard(
+                bottomSheet,
+                pickerView,
+                minSheetHeight,
+                expandedRatio,
+                imeInsets.bottom,
+                navigationInsets.bottom
+            )
+            if (keyboardVisible && bottomSheet.behavior.state != BottomSheetBehavior.STATE_EXPANDED) {
+                pickerView.setSheetExpansionInProgress(true)
+                bottomSheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+            val shouldRestoreInitialSnap = wasKeyboardVisible &&
+                !keyboardVisible &&
+                bottomSheet.behavior.state != BottomSheetBehavior.STATE_HIDDEN
+            if (shouldRestoreInitialSnap) {
+                bottomSheet.behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
+            wasKeyboardVisible = keyboardVisible
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(container) { _, insets ->
+            applyDialogInsets(insets)
+            insets
         }
 
         // Strip ALL backgrounds from BottomSheet internals
@@ -305,22 +336,37 @@ class EmojiSheetModule : Module() {
             val d = dlg as BottomSheetDialog
             val bottomSheetInternal = d.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
             bottomSheetContentView = bottomSheetInternal
+            d.findViewById<View>(com.google.android.material.R.id.container)?.fitsSystemWindows = false
+            d.findViewById<View>(com.google.android.material.R.id.coordinator)?.fitsSystemWindows = false
             bottomSheetInternal?.apply {
+                fitsSystemWindows = false
                 setBackgroundColor(Color.TRANSPARENT)
                 (parent as? View)?.setBackgroundColor(Color.TRANSPARENT)
+                ViewCompat.setOnApplyWindowInsetsListener(this) { _, insets ->
+                    applyDialogInsets(insets)
+                    insets
+                }
             }
+            bottomSheet.window?.let { window ->
+                WindowCompat.setDecorFitsSystemWindows(window, false)
+                window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
+            }
+            ViewCompat.requestApplyInsets(container)
+            bottomSheetInternal?.let { ViewCompat.requestApplyInsets(it) }
             pickerView.loadDataAsync()
             sendEvent("onSheetOpened", android.os.Bundle())
         }
 
         bottomSheet.window?.let { window ->
             WindowCompat.setDecorFitsSystemWindows(window, false)
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
         }
         bottomSheet.window?.setDimAmount(backdropOpacity)
 
         bottomSheet.behavior.apply {
             state = BottomSheetBehavior.STATE_HALF_EXPANDED
             this.halfExpandedRatio = halfExpandedRatio
+            expandedOffset = (activity.resources.displayMetrics.heightPixels * (1f - expandedRatio)).toInt()
             peekHeight = minSheetHeight
             isHideable = true
             skipCollapsed = false
@@ -328,6 +374,9 @@ class EmojiSheetModule : Module() {
             isDraggable = gestureEnabled
             addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    if (newState == BottomSheetBehavior.STATE_DRAGGING) {
+                        dismissKeyboard()
+                    }
                     pickerView.setSheetExpanded(newState == BottomSheetBehavior.STATE_EXPANDED)
                     pickerView.setSheetExpansionInProgress(
                         newState == BottomSheetBehavior.STATE_DRAGGING ||
@@ -363,6 +412,64 @@ class EmojiSheetModule : Module() {
         bottomSheetContentView = null
         dialog?.dismiss()
         dialog = null
+    }
+
+    private fun dismissKeyboard() {
+        val activity = appContext.currentActivity ?: return
+        val focusedView = activity.currentFocus
+        val tokenView = focusedView
+            ?: bottomSheetContentView
+            ?: dialog?.window?.decorView
+            ?: return
+        val inputMethodManager = tokenView.context
+            .getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            ?: return
+
+        inputMethodManager.hideSoftInputFromWindow(tokenView.windowToken, 0)
+        focusedView?.clearFocus()
+    }
+
+    private fun updateSheetForKeyboard(
+        bottomSheet: BottomSheetDialog,
+        pickerView: EmojiSheetUIView,
+        minSheetHeight: Int,
+        expandedRatio: Float,
+        imeBottom: Int,
+        navigationBottom: Int
+    ) {
+        val keyboardHeight = if (imeBottom > navigationBottom) imeBottom else 0
+        val keyboardVisible = keyboardHeight > 0
+        val sheetView = bottomSheetContentView
+            ?: bottomSheet.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+
+        pickerView.setKeyboardDockedToSheet(keyboardVisible)
+
+        if (sheetView == null) return
+
+        val parentHeight = ((sheetView.parent as? View)?.height ?: 0)
+            .takeIf { it > 0 }
+            ?: sheetView.rootView.height.takeIf { it > 0 }
+            ?: sheetView.resources.displayMetrics.heightPixels
+        val desiredExpandedHeight = maxOf(1, (parentHeight * expandedRatio).toInt())
+        val targetHeight = if (keyboardVisible) {
+            minOf(maxOf(1, parentHeight - keyboardHeight), desiredExpandedHeight)
+        } else {
+            ViewGroup.LayoutParams.MATCH_PARENT
+        }
+        bottomSheet.behavior.expandedOffset = if (keyboardVisible) {
+            maxOf(0, parentHeight - keyboardHeight - targetHeight)
+        } else {
+            maxOf(0, parentHeight - desiredExpandedHeight)
+        }
+
+        val layoutParams = sheetView.layoutParams
+        if (layoutParams.height != targetHeight) {
+            layoutParams.height = targetHeight
+            sheetView.layoutParams = layoutParams
+        }
+        sheetView.translationY = 0f
+        bottomSheet.behavior.peekHeight = minSheetHeight
+        sheetView.requestLayout()
     }
 
     private fun updateSheetDrag(bottomSheet: BottomSheetDialog, distance: Float) {
