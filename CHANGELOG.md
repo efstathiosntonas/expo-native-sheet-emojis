@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.1.0](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v2.0.4...v2.1.0) (2026-05-14)
+
+### Features
+
+* improve emoji sheet accessibility and dismiss UX ([#25](https://github.com/efstathiosntonas/expo-native-sheet-emojis/issues/25)) ([ddd0d12](https://github.com/efstathiosntonas/expo-native-sheet-emojis/commit/ddd0d1247ed7e92bb64e4769e560ccbeba57b248))
+
 ## [2.0.4](https://github.com/efstathiosntonas/expo-native-sheet-emojis/compare/v2.0.2...v2.0.4) (2026-05-12)
 
 ### Bug Fixes
