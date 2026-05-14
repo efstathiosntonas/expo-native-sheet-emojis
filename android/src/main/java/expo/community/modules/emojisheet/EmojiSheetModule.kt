@@ -9,11 +9,14 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import android.widget.FrameLayout
-import android.widget.LinearLayout
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import expo.modules.kotlin.Promise
@@ -250,18 +253,36 @@ class EmojiSheetModule : Module() {
         }
 
         // Drag handle
+        val handleTargetHeight = (24 * density).toInt()
         val handleBar = View(activity).apply {
             val width = (40 * density).toInt()
             val height = (4 * density).toInt()
-            layoutParams = LinearLayout.LayoutParams(width, height).apply {
-                gravity = Gravity.CENTER_HORIZONTAL
+            layoutParams = FrameLayout.LayoutParams(width, height, Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply {
                 topMargin = (8 * density).toInt()
-                bottomMargin = (4 * density).toInt()
             }
             background = GradientDrawable().apply {
                 setColor(handleColor)
                 cornerRadius = height / 2f
             }
+        }
+        val handleTouchTarget = FrameLayout(activity).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                handleTargetHeight
+            )
+            contentDescription = "Dismiss emoji sheet"
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
+            isClickable = true
+            isFocusable = true
+            setOnClickListener { dismissSheet(cancelled = true) }
+            ViewCompat.setAccessibilityDelegate(this, object : AccessibilityDelegateCompat() {
+                override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
+                    super.onInitializeAccessibilityNodeInfo(host, info)
+                    info.className = Button::class.java.name
+                    info.hintText = "Double tap to dismiss."
+                }
+            })
+            addView(handleBar)
         }
 
         // Container
@@ -285,7 +306,7 @@ class EmojiSheetModule : Module() {
             }
             clipToOutline = true
             outlineProvider = android.view.ViewOutlineProvider.BACKGROUND
-            addView(handleBar)
+            addView(handleTouchTarget)
             val pickerLp = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
             )

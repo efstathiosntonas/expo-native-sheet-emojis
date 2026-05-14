@@ -337,6 +337,7 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
 
     private let backdropView = UIView()
     private let sheetContainerView = UIView()
+    private let grabberHitAreaView = UIControl()
     private let grabberView = UIView()
     private let contentContainerView = UIView()
     private let backdropColor: UIColor
@@ -409,6 +410,11 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
 
         guard hasPresented, !isAnimatingDismissal else { return }
         applyDetentLayout(currentDetent)
+    }
+
+    override func accessibilityPerformEscape() -> Bool {
+        requestDismiss()
+        return true
     }
 
     func embedPickerView(_ embeddedView: UIView) {
@@ -574,9 +580,7 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
         let dismissalThreshold = max(sheetContainerView.bounds.height * 0.5, 1)
         let shouldDismiss = distance >= dismissalThreshold || velocity >= 1400
         if shouldDismiss {
-            dismissSheet { [weak self] in
-                self?.onDismiss?()
-            }
+            requestDismiss()
             return
         }
 
@@ -632,17 +636,28 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
         sheetContainerView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         sheetContainerView.layer.masksToBounds = true
 
+        grabberHitAreaView.translatesAutoresizingMaskIntoConstraints = false
+        grabberHitAreaView.backgroundColor = .clear
+        grabberHitAreaView.isAccessibilityElement = true
+        grabberHitAreaView.accessibilityLabel = "Dismiss emoji sheet"
+        grabberHitAreaView.accessibilityHint = "Double-tap to dismiss."
+        grabberHitAreaView.accessibilityTraits = .button
+        grabberHitAreaView.addTarget(self, action: #selector(handleGrabberTap), for: .touchUpInside)
+
         grabberView.translatesAutoresizingMaskIntoConstraints = false
         grabberView.backgroundColor = theme.handleColor
         grabberView.layer.cornerRadius = Layout.grabberHeight / 2
+        grabberView.isUserInteractionEnabled = false
 
         contentContainerView.translatesAutoresizingMaskIntoConstraints = false
         contentContainerView.backgroundColor = .clear
 
+        sheetContainerView.accessibilityViewIsModal = true
         view.addSubview(backdropView)
         view.addSubview(sheetContainerView)
         sheetContainerView.addSubview(contentContainerView)
-        sheetContainerView.addSubview(grabberView)
+        sheetContainerView.addSubview(grabberHitAreaView)
+        grabberHitAreaView.addSubview(grabberView)
 
         if gestureEnabled {
             let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handleSheetPan(_:)))
@@ -668,11 +683,16 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
             sheetContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             sheetBottomConstraint,
 
+            grabberHitAreaView.topAnchor.constraint(equalTo: sheetContainerView.topAnchor),
+            grabberHitAreaView.centerXAnchor.constraint(equalTo: sheetContainerView.centerXAnchor),
+            grabberHitAreaView.widthAnchor.constraint(equalToConstant: 96),
+            grabberHitAreaView.heightAnchor.constraint(equalToConstant: 24),
+
             grabberView.topAnchor.constraint(
-                equalTo: sheetContainerView.topAnchor,
+                equalTo: grabberHitAreaView.topAnchor,
                 constant: Layout.grabberTopInset
             ),
-            grabberView.centerXAnchor.constraint(equalTo: sheetContainerView.centerXAnchor),
+            grabberView.centerXAnchor.constraint(equalTo: grabberHitAreaView.centerXAnchor),
             grabberView.widthAnchor.constraint(equalToConstant: Layout.grabberWidth),
             grabberView.heightAnchor.constraint(equalToConstant: Layout.grabberHeight),
 
@@ -684,6 +704,15 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
     }
 
     @objc private func handleBackdropTap() {
+        requestDismiss()
+    }
+
+    @objc private func handleGrabberTap() {
+        requestDismiss()
+    }
+
+    private func requestDismiss() {
+        guard !isAnimatingDismissal else { return }
         dismissSheet { [weak self] in
             self?.onDismiss?()
         }
@@ -713,9 +742,7 @@ private final class SheetViewController: UIViewController, UIGestureRecognizerDe
                 velocityY > Layout.dismissVelocityThreshold
 
             if shouldDismiss {
-                dismissSheet { [weak self] in
-                    self?.onDismiss?()
-                }
+                requestDismiss()
             } else {
                 let targetDetent: Detent
 
